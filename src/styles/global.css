@@ -49,7 +49,6 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 300; text-wrap: balance; }
 .mh-name { display: block; font-family: var(--serif); font-weight: 400; font-size: clamp(54px, 17vw, 220px); line-height: .9; letter-spacing: .06em; padding-left: .06em; }
 .mh-sub { display: block; margin-top: clamp(6px, 1vw, 14px); font-weight: 500; font-size: clamp(11px, 1.1vw, 15px); letter-spacing: .6em; padding-left: .6em; text-transform: uppercase; }
 .issue-line { display: flex; justify-content: space-between; gap: 12px; border-block: 1px solid rgba(255,255,255,.55); margin: 12px var(--gr) 0 var(--gl); padding: 6px 0; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; animation: rise 1.4s .35s var(--ease) both; }
-.issue-line span:nth-child(2) { display: none; }
 .cover-body { margin-top: auto; padding: 0 var(--gr) clamp(24px, 5vh, 48px) var(--gl); display: grid; gap: 22px; }
 .cover h1 { font-size: clamp(46px, 10vw, 120px); line-height: .95; animation: rise 1.4s .5s var(--ease) both; }
 .cover h1 em { font-style: italic; }
@@ -228,7 +227,6 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 300; text-wrap: balance; }
 
 @media (min-width: 700px) {
   .spread { flex-basis: 78%; }
-  .issue-line span:nth-child(2) { display: inline; }
 }
 @media (min-width: 1000px) {
   .mast nav .tour-link { display: inline-flex; }
