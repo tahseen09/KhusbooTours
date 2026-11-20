@@ -12,6 +12,14 @@ const trips = (await getCollection('trips')).sort((a, b) => a.data.order - b.dat
 const cheapest = Math.min(...trips.map((t) => t.data.price));
 const sizes = '(min-width: 900px) 55vw, 100vw';
 const widths = [480, 800, 1200, 1600];
+// Every trip and every stop on it becomes a searchable destination.
+const places = trips.flatMap(({ id, data: t }) => {
+  const names = [t.name, ...t.stops, ...t.days.map((d) => d.place)].filter((n) => n !== 'Home');
+  return [...new Set(names)].map((place) => ({
+    tripId: id, tripName: t.name, place, code: t.code, color: t.color, onColor: t.onColor, nights: t.nights, price: formatPrice(t.price),
+    haystack: [place, t.name, t.city, t.bestFor, ...t.tags, ...t.stops].join(' ').toLowerCase(),
+  }));
+});
 const filters = [
   { key: 'all', label: `All ${trips.length} trips` },
   { key: 'snow', label: 'Snow' },
@@ -51,6 +59,23 @@ const filters = [
     <div class="wrap">
       <span class="eyebrow">The network · every line leaves Rourkela</span>
       <h2 id="net-h">Pick a line. <span class="soft">We handle the ride.</span></h2>
+      <form class="search" id="search" role="search" action={withBase('')}>
+        <label class="visually-hidden" for="search-input">Search destinations</label>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="search-input" type="search" placeholder="Where to? Try Gulmarg, beach, snow" autocomplete="off" aria-controls="search-results" aria-describedby="search-status" />
+        <ul class="search-results" id="search-results" hidden>
+          {places.map((p) => (
+            <li data-search={p.haystack}>
+              <a href={withBase(`trips/${p.tripId}/`)} style={`--c:${p.color};--on:${p.onColor}`}>
+                <span class="code">{p.code}</span>
+                <span><b>{p.place}</b><span class="soft">{p.place === p.tripName ? `${p.nights} · from ${p.price}` : `On the ${p.tripName} trip · ${p.nights}`}</span></span>
+              </a>
+            </li>
+          ))}
+          <li class="search-empty" id="search-empty" hidden>No trip goes there yet. Ask us on WhatsApp and we will plan it.</li>
+        </ul>
+        <p class="visually-hidden" id="search-status" aria-live="polite"></p>
+      </form>
       <div class="chips" role="group" aria-label="Filter trips">
         {filters.map((f, i) => <button class="chip" type="button" data-filter={f.key} aria-pressed={i === 0 ? 'true' : 'false'}>{f.label}</button>)}
       </div>
@@ -132,6 +157,50 @@ const filters = [
     document.querySelectorAll<HTMLElement>('.route').forEach((r) => r.classList.toggle('dim', !matches(r)));
     document.querySelectorAll<HTMLElement>('.feature').forEach((f) => { f.hidden = !matches(f); });
   }));
+
+  // Destination search: shows every destination on focus, narrows as you type.
+  const searchForm = document.getElementById('search') as HTMLFormElement | null;
+  const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
+  const results = document.getElementById('search-results');
+  const status = document.getElementById('search-status');
+  if (searchForm && searchInput && results && status) {
+    const items = Array.from(results.querySelectorAll<HTMLLIElement>('li[data-search]'));
+    const empty = document.getElementById('search-empty');
+    const update = () => {
+      const terms = searchInput.value.toLowerCase().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      items.forEach((li) => {
+        const match = terms.every((term) => (li.dataset.search ?? '').includes(term));
+        li.hidden = !match;
+        if (match) shown++;
+      });
+      results.hidden = false;
+      if (empty) empty.hidden = shown > 0;
+      status.textContent = shown ? `${shown} destination${shown === 1 ? '' : 's'} found` : 'No destinations found';
+    };
+    searchInput.addEventListener('focus', update);
+    searchInput.addEventListener('input', update);
+    searchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const first = items.find((li) => !li.hidden)?.querySelector('a');
+      if (first) location.href = first.href;
+    });
+    document.addEventListener('click', (event) => {
+      if (!searchForm.contains(event.target as Node)) { results.hidden = true; status.textContent = ''; }
+    });
+    searchInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') { results.hidden = true; status.textContent = ''; }
+      if (event.key === 'ArrowDown') { event.preventDefault(); items.find((li) => !li.hidden)?.querySelector('a')?.focus(); }
+    });
+    results.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+      event.preventDefault();
+      const links = items.filter((li) => !li.hidden).map((li) => li.querySelector('a')!);
+      const i = links.indexOf(document.activeElement as HTMLAnchorElement);
+      const next = event.key === 'ArrowDown' ? links[i + 1] : links[i - 1];
+      (next ?? searchInput).focus();
+    });
+  }
 
   // Split-flap "next departure" board.
   const flaps = document.getElementById('flaps');

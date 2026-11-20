@@ -44,10 +44,13 @@ const navTrips = [
       {backLink
         ? <a class="back-link" href={withBase('#lines')}>← All trips</a>
         : <a class="mast-logo" href={withBase('')}><b>KHUSBOO</b><span class="eyebrow">Issue 01 · Winter 26</span></a>}
-      <nav aria-label="Trips">
-        {navTrips.map((t) => <a href={withBase(t.href)}>{t.label}</a>)}
-      </nav>
-      {backLink && <a class="mast-logo" href={withBase('')}><b>KHUSBOO</b></a>}
+      <div class="mast-right">
+        <nav aria-label="Trips">
+          {navTrips.map((t) => <a href={withBase(t.href)}>{t.label}</a>)}
+        </nav>
+        <a class="mast-search" href={withBase('#lines')} aria-label="Search destinations" data-search-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></a>
+        {backLink && <a class="mast-logo" href={withBase('')}><b>KHUSBOO</b></a>}
+      </div>
     </header>
 
     <main><slot /></main>
@@ -68,6 +71,14 @@ const navTrips = [
     {!backLink && <a class="fab" id="fab" href={whatsappLink()} target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><WhatsAppIcon /></a>}
 
     <script>
+      // On the home page the search icon jumps to the search box and focuses it.
+      const searchInput = document.getElementById('search-input');
+      document.querySelector('[data-search-link]')?.addEventListener('click', (event) => {
+        if (!searchInput) return;
+        event.preventDefault();
+        document.getElementById('lines')?.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => searchInput.focus({ preventScroll: true }), 400);
+      });
       const fab = document.getElementById('fab');
       const hero = document.querySelector('.cover, .trip-hero');
       if (fab && hero) {
