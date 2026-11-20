@@ -8,18 +8,17 @@ nights: 4N/5D
 price: 11999
 bestFor: Beaches and sunsets
 tags: [beach, budget]
-color: "#FF5A1F"
-onColor: "#0B0D12"
-background: "#1E0F0A"
-foreground: "#FFFFFF"
+color: "#B8693F"
+page: 48
+summary: Beaches, old churches and a sunset cruise
+best: Nov–Feb
+highest: Sea level
 stops: [North Goa, Old Goa, South Goa]
-busSeconds: 7
-kicker: The Goa issue · 4N / 5D
 title: Sunsets are better together.
-dek: Old churches, spice farms, jet skis, a river cruise at sunset, and the slow ride back from South Goa with the windows down.
-hero: ../../assets/photos/goa-mandrem-sunset.jpg
-heroAlt: A child plays on the wet sand of Mandrem beach at sunset
-place: Mandrem Beach, Goa
+dek: Old churches, spice farms, a river cruise at dusk and the quiet beaches of South Goa.
+hero: ../../assets/photos/goa-beach-hill.jpg
+heroAlt: A wide sandy beach with a green headland in Goa
+place: A quiet beach in Goa
 includes:
   - Train or flight booking help
   - Hotel near the beach
@@ -44,9 +43,12 @@ days:
     title: Back to Rourkela
     text: Breakfast by the sea, then your journey home.
 gallery:
-  - src: ../../assets/photos/goa-fishing-boat.jpg
-    alt: A fishing boat and a beach dog at Palolem
-    caption: Palolem in the morning
+  - src: ../../assets/photos/goa-palm-sunset.jpg
+    alt: A palm tree silhouetted against an orange sunset over the sea
+    caption: Sunset over the Arabian Sea
+  - src: ../../assets/photos/goa-golden-shore.jpg
+    alt: Soft waves on a sandy shore at golden hour
+    caption: Golden hour on the shore
 ---
 
 Goa is more than a party town. We plan it as a beach holiday with real Goan food, old churches and quiet South Goa beaches, so it works for friends, couples and families.

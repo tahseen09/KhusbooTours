@@ -8,18 +8,17 @@ nights: 5N/6D
 price: 21999
 bestFor: Snow and houseboats
 tags: [snow]
-color: "#2F5BFF"
-onColor: "#FFFFFF"
-background: "#0E1733"
-foreground: "#FFFFFF"
+color: "#3D5A80"
+page: 12
+summary: Houseboats, Gulmarg snow and Sonmarg
+best: Dec–Feb for snow
+highest: Gulmarg, 2,650 m
 stops: [Srinagar, Gulmarg, Sonmarg, Dal Lake]
-busSeconds: 11
-kicker: The Kashmir issue · 5N / 6D
 title: Sleep on the water. Wake up in snow.
-dek: A houseboat on Dal Lake, a gondola up Gulmarg, and Sonmarg’s glacier light. Six days that feel like a month.
-hero: ../../assets/photos/kashmir-sonmarg-lake.jpg
-heroAlt: Krishansar Lake in a green valley near Sonmarg
-place: Krishansar Lake, Sonmarg
+dek: A houseboat on Dal Lake, a gondola up Gulmarg and the glacier light of Sonmarg. Six days that feel like a month.
+hero: ../../assets/photos/kashmir-shikaras.jpg
+heroAlt: Shikaras crossing Dal Lake on a misty morning
+place: Dal Lake, Srinagar
 includes:
   - Flight or train booking help
   - Hotel and houseboat stay
@@ -47,15 +46,15 @@ days:
     title: Back to Rourkela
     text: Drop in Srinagar for your journey home.
 gallery:
-  - src: ../../assets/photos/kashmir-gulmarg.jpg
-    alt: A snowed-in hut in Gulmarg under white peaks
-    caption: Gulmarg in winter
-  - src: ../../assets/photos/kashmir-sonmarg-river.jpg
-    alt: A glacier stream running through Sonmarg
-    caption: Sonmarg
-  - src: ../../assets/photos/kashmir-shikara-sunset.jpg
-    alt: A shikara on Dal Lake at sunset
-    caption: Dal Lake at sunset
+  - src: ../../assets/photos/kashmir-dal-life.jpg
+    alt: Wooden houses and boats on the water in Srinagar
+    caption: Life on Dal Lake
+  - src: ../../assets/photos/kashmir-snowfield.jpg
+    alt: Snowfields under a wide blue sky in Kashmir
+    caption: Snowfields in winter
+  - src: ../../assets/photos/cover-dal-lake-houseboats.jpg
+    alt: Houseboats moored below snow-capped mountains
+    caption: Houseboats, Srinagar
 ---
 
 Kashmir is the trip people save for years. We make it simple: you take the train or flight we book, and from Srinagar onwards a driver, a guide and a houseboat are waiting.

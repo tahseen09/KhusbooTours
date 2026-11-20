@@ -1,146 +1,125 @@
 ---
 import { getCollection } from 'astro:content';
-import { Picture } from 'astro:assets';
+import Photo from '../components/Photo.astro';
+import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import BoardingPass from '../components/BoardingPass.astro';
 import WhatsAppIcon from '../components/WhatsAppIcon.astro';
+import RouteLine from '../components/RouteLine.astro';
 import { PHONE_DISPLAY, formatPrice, whatsappLink, withBase } from '../lib/site';
-import coverPhoto from '../assets/photos/kashmir-dal-lake.jpg';
-import backPhoto from '../assets/photos/gangtok-kanchenjunga-dawn.jpg';
+import coverPhoto from '../assets/photos/cover-dal-lake-houseboats.jpg';
 
 const trips = (await getCollection('trips')).sort((a, b) => a.data.order - b.data.order);
+const ogImage = await getImage({ src: coverPhoto, width: 1200, format: 'jpg', quality: 70 });
 const cheapest = Math.min(...trips.map((t) => t.data.price));
-const sizes = '(min-width: 900px) 55vw, 100vw';
-const widths = [480, 800, 1200, 1600];
-// Every trip and every stop on it becomes a searchable destination.
-const places = trips.flatMap(({ id, data: t }) => {
-  const names = [t.name, ...t.stops, ...t.days.map((d) => d.place)].filter((n) => n !== 'Home');
-  return [...new Set(names)].map((place) => ({
-    tripId: id, tripName: t.name, place, code: t.code, color: t.color, onColor: t.onColor, nights: t.nights, price: formatPrice(t.price),
-    haystack: [place, t.name, t.city, t.bestFor, ...t.tags, ...t.stops].join(' ').toLowerCase(),
+const nights = (n: string) => n.replace('/', ' / ');
+
+// Every tour and every stop on it is a searchable destination.
+const places = trips.flatMap(({ id, data: t }, index) => {
+  const names = [...new Set([t.name, ...t.stops, ...t.days.map((d) => d.place)])].filter((n) => n !== 'Home');
+  return names.map((place) => ({
+    place, index, href: withBase(`trips/${id}/`),
+    detail: place === t.name ? `${nights(t.nights)} · from ${formatPrice(t.price)}` : `On the ${t.name} tour`,
+    haystack: [place, t.name, t.city, t.bestFor, t.summary, ...t.tags, ...t.stops].join(' ').toLowerCase(),
   }));
 });
-const filters = [
-  { key: 'all', label: `All ${trips.length} trips` },
-  { key: 'snow', label: 'Snow' },
-  { key: 'beach', label: 'Beach' },
-  { key: 'adventure', label: 'Adventure' },
-  { key: 'budget', label: 'Under ₹15k' },
-];
 ---
 <Base
-  title="Khusboo Tours · Trips from Rourkela to Kashmir, Gangtok, Manali and Goa"
-  description={`Tour packages from Rourkela, Odisha. Kashmir, Gangtok, Manali and Goa with travel, hotels and sightseeing included. Trips from ${formatPrice(cheapest)} per person.`}
-  ogImage={coverPhoto.src}
+  title="Khusboo Tours · Tours from Rourkela to Kashmir, Gangtok, Manali and Goa"
+  description={`Tour packages from Rourkela, Odisha. Kashmir, Gangtok, Manali and Goa with travel, hotels and sightseeing planned for you. From ${formatPrice(cheapest)} per person.`}
+  ogImage={ogImage.src}
 >
   <section class="cover" aria-label="Cover">
     <div class="cover-img">
-      <Picture src={coverPhoto} alt="Shikaras glide across Dal Lake under snow-capped mountains" formats={['avif', 'webp']} widths={[480, 800, 1200, 1920]} sizes="100vw" loading="eager" fetchpriority="high" />
+      <Photo src={coverPhoto} alt="Houseboats on Dal Lake below snow-capped mountains" sizes="100vw" priority />
     </div>
-    <h1 aria-label="Escape">
-      <span class="row" aria-hidden="true"><span class="ch" style="--i:0">E</span><span class="ch" style="--i:1">S</span><span class="ch" style="--i:2">C</span></span>
-      <span class="row" aria-hidden="true"><span class="ch" style="--i:3">A</span><span class="ch" style="--i:4">P</span><span class="ch" style="--i:5">E</span></span>
-    </h1>
-    <p class="dek">The issue for people who need a weekend that lasts a week.</p>
-    <div class="cover-foot">
-      <div class="cover-lines">
-        <a href={withBase('trips/kashmir/')} style="--i:0">Snow before breakfast <span>— Gulmarg</span></a>
-        <a href={withBase('trips/goa/')} style="--i:1">Goa at golden hour <span>— Mandrem</span></a>
-        <a href={withBase('trips/gangtok/')} style="--i:2">12,310 ft up at Tsomgo Lake <span>— Sikkim</span></a>
-      </div>
-      <div class="board">
-        <div class="flapwrap"><span class="eyebrow">Next departure</span><div class="flaps" id="flaps" data-words={trips.map((t) => t.data.name.toUpperCase()).join(',')} aria-hidden="true"></div></div>
-        <span class="eyebrow">Trips from {formatPrice(cheapest)}</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="network" id="lines" aria-labelledby="net-h">
-    <div class="wrap">
-      <span class="eyebrow">The network · every line leaves Rourkela</span>
-      <h2 id="net-h">Pick a line. <span class="soft">We handle the ride.</span></h2>
-      <form class="search" id="search" role="search" action={withBase('')}>
-        <label class="visually-hidden" for="search-input">Search destinations</label>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-        <input id="search-input" type="search" placeholder="Where to? Try Gulmarg, beach, snow" autocomplete="off" aria-controls="search-results" aria-describedby="search-status" />
-        <ul class="search-results" id="search-results" hidden>
-          {places.map((p) => (
-            <li data-search={p.haystack}>
-              <a href={withBase(`trips/${p.tripId}/`)} style={`--c:${p.color};--on:${p.onColor}`}>
-                <span class="code">{p.code}</span>
-                <span><b>{p.place}</b><span class="soft">{p.place === p.tripName ? `${p.nights} · from ${p.price}` : `On the ${p.tripName} trip · ${p.nights}`}</span></span>
-              </a>
-            </li>
-          ))}
-          <li class="search-empty" id="search-empty" hidden>No trip goes there yet. Ask us on WhatsApp and we will plan it.</li>
-        </ul>
-        <p class="visually-hidden" id="search-status" aria-live="polite"></p>
-      </form>
-      <div class="chips" role="group" aria-label="Filter trips">
-        {filters.map((f, i) => <button class="chip" type="button" data-filter={f.key} aria-pressed={i === 0 ? 'true' : 'false'}>{f.label}</button>)}
-      </div>
-      <div class="hub"><span class="hub-dot"></span><b>Rourkela</b><span class="mono">HUB · ROU</span></div>
-      {trips.map(({ id, data: t }) => (
-        <a class="route" href={withBase(`trips/${id}/`)} data-tags={t.tags.join(' ')} style={`--c:${t.color};--on:${t.onColor};--d:${t.busSeconds}s`}>
-          <span class="trunk"></span>
-          <span class="route-body">
-            <span class="route-head"><span class="code">{t.code}</span><b>{t.name}</b><span class="mono">{t.nights} · {formatPrice(t.price)}</span></span>
-            <span class="track">
-              <span class="bus"><svg viewBox="0 0 30 20" aria-hidden="true"><rect x="1" y="1" width="28" height="14" rx="3" fill="currentColor"/><rect x="4" y="4" width="5" height="5" rx="1" fill="#F1F3F0"/><rect x="11" y="4" width="5" height="5" rx="1" fill="#F1F3F0"/><rect x="18" y="4" width="5" height="5" rx="1" fill="#F1F3F0"/><circle cx="8" cy="16" r="3" fill="currentColor" stroke="#F1F3F0" stroke-width="1.5"/><circle cx="22" cy="16" r="3" fill="currentColor" stroke="#F1F3F0" stroke-width="1.5"/></svg></span>
-              <span class="stops">{t.stops.map((s) => <span class="stop">{s}</span>)}</span>
-            </span>
-          </span>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  {trips.map(({ id, data: t }) => (
-    <article class="feature" id={id} data-tags={t.tags.join(' ')} style={`--bg:${t.background};--fg:${t.foreground};--c:${t.color};--on:${t.onColor}`}>
-      <div class="f-grid">
-        <div class="f-media">
-          <Picture src={t.hero} alt={t.heroAlt} formats={['avif', 'webp']} widths={widths} sizes={sizes} loading="lazy" />
-          <span class="code">LINE {t.code}</span>
-          <span class="place">{t.place}</span>
-        </div>
-        <div class="f-copy">
-          <span class="eyebrow">{t.kicker}</span>
-          <h3><a href={withBase(`trips/${id}/`)}>{t.title}</a></h3>
-          <p class="dek-text">{t.dek}</p>
-          <BoardingPass trip={t} />
-          <a class="read" href={withBase(`trips/${id}/`)}>Read the full itinerary →</a>
-        </div>
-      </div>
-    </article>
-  ))}
-
-  <section class="quote">
-    <div class="wrap">
-      <blockquote>“Our Manali trip from Rourkela was <span class="hl">perfectly managed.</span> Hotels, food and sightseeing were excellent.”</blockquote>
-      <cite>Rahul Sharma · Line M6, Manali</cite>
-    </div>
-  </section>
-
-  <section class="incl" aria-labelledby="incl-h">
-    <div class="wrap">
-      <span class="eyebrow">In every ticket</span>
-      <h2 id="incl-h">You pack the bag. <span class="soft">We do the rest.</span></h2>
-      <ul>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16M8 21l1.5-4M16 21l-1.5-4"/></svg>Train, bus or flight booked for you</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20V8l9-5 9 5v12"/><path d="M9 20v-6h6v6"/></svg>Hotels and houseboats we have checked</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Sightseeing and permits sorted</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg>A real person on call, 24x7</li>
+    <div class="masthead"><span class="mh-name">KHUSBOO</span><span class="mh-sub">Tours</span></div>
+    <div class="issue-line"><span>Issue 01</span><span>All India Tours</span><span>Winter 2026</span></div>
+    <div class="cover-body">
+      <h1>Fill your <em>soul.</em></h1>
+      <ul class="cover-tours" aria-label="Tours in this issue">
+        {trips.map(({ id, data: t }, i) => (
+          <li><a href={withBase(`trips/${id}/`)} data-go={i}><b>{t.name}</b><span>{nights(t.nights)} · from {formatPrice(t.price)}</span></a></li>
+        ))}
       </ul>
     </div>
   </section>
 
-  <section class="back" aria-labelledby="back-h">
-    <div class="back-img"><Picture src={backPhoto} alt="The Kanchenjunga range glowing gold at dawn" formats={['avif', 'webp']} widths={[480, 800, 1200, 1600]} sizes="100vw" loading="lazy" /></div>
+  <section class="contents" id="contents" aria-labelledby="contents-h">
     <div class="wrap">
-      <span class="eyebrow">Back cover</span>
-      <h2 id="back-h">Your seat is waiting.</h2>
-      <a class="btn-wa" href={whatsappLink()} target="_blank" rel="noopener"><WhatsAppIcon /> Say hi on WhatsApp</a>
-      <span class="phone">or call <a href="tel:+919438836765">{PHONE_DISPLAY}</a></span>
+      <div class="contents-head">
+        <span class="label">In this issue</span>
+        <h2 id="contents-h">Four tours from Rourkela</h2>
+        <p>Travel, hotels and sightseeing planned for you. Pick one, or tell us where you want to go.</p>
+        <form class="search" id="search" role="search">
+          <label class="sr" for="q">Search destinations</label>
+          <input id="q" type="search" placeholder="Search Gulmarg, beach, snow…" autocomplete="off" aria-controls="results" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <ul class="results" id="results" hidden>
+            {places.map((p) => <li data-search={p.haystack}><a href={p.href} data-go={p.index}><b>{p.place}</b><span>{p.detail}</span></a></li>)}
+            <li class="none" id="no-results" hidden>No tour goes there yet. Message us and we will plan it.</li>
+          </ul>
+          <p class="sr" id="status" aria-live="polite"></p>
+        </form>
+      </div>
+      <ol class="toc">
+        {trips.map(({ id, data: t }, i) => (
+          <li><a href={withBase(`trips/${id}/`)} data-go={i}><span class="pg">{t.page}</span><b>{t.name}</b><span class="price">from {formatPrice(t.price)}</span><span class="sub">{nights(t.nights)} · {t.summary}</span></a></li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="issue" id="issue" aria-labelledby="issue-h">
+    <div class="wrap issue-bar">
+      <h2 id="issue-h">The features</h2>
+      <div class="controls">
+        <button class="arrow" type="button" id="prev" aria-label="Previous tour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <span class="count" id="count">1 / {trips.length}</span>
+        <button class="arrow" type="button" id="next" aria-label="Next tour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+    <div class="spreads" id="spreads" tabindex="0" aria-label="Tour features. Swipe or use the arrows.">
+      {trips.map(({ id, data: t }) => (
+        <article class="spread" id={id} style={`--c:${t.color}`} aria-label={`${t.name} tour`}>
+          <figure class="spread-photo">
+            <Photo src={t.hero} alt={t.heroAlt} sizes="(min-width: 1000px) 560px, 86vw" />
+            <figcaption>{t.place}</figcaption>
+          </figure>
+          <div class="spread-text">
+            <span class="label">The {t.name} tour</span>
+            <h3><a href={withBase(`trips/${id}/`)}>{t.title}</a></h3>
+            <p class="dek">{t.dek}</p>
+            <RouteLine stops={t.stops} />
+            <dl class="facts">
+              <div><dt>Duration</dt><dd>{nights(t.nights)}</dd></div>
+              <div><dt>From</dt><dd>{formatPrice(t.price)}</dd></div>
+              <div><dt>Best time</dt><dd>{t.best}</dd></div>
+              <div><dt>Highest point</dt><dd>{t.highest}</dd></div>
+            </dl>
+            <div class="cta-row">
+              <a class="btn" href={whatsappLink(`Hi Khusboo Tours, I want to book the ${t.name} tour (${t.nights}).`)} target="_blank" rel="noopener"><WhatsAppIcon /> Book on WhatsApp</a>
+              <a class="btn ghost" href={withBase(`trips/${id}/`)}>Read the itinerary</a>
+            </div>
+          </div>
+          <div class="folio"><span>Khusboo Tours · Issue 01</span><span>p. {t.page}</span></div>
+        </article>
+      ))}
+    </div>
+    <p class="hint"><span>Swipe for the next tour</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></p>
+  </section>
+
+  <section class="quote wrap">
+    <blockquote>“Our Manali trip from Rourkela was perfectly managed. Hotels, food and sightseeing were excellent.”</blockquote>
+    <cite class="label">Rahul Sharma · Manali</cite>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <span class="label">Plan a trip</span>
+      <h2>Let’s plan yours.</h2>
+      <p>Tell us where, when and who is coming. We reply on WhatsApp with a plan and a price.</p>
+      <a class="btn" href={whatsappLink()} target="_blank" rel="noopener"><WhatsAppIcon /> Message us on WhatsApp</a>
+      <p class="phone">or call <a href="tel:+919438836765">{PHONE_DISPLAY}</a></p>
     </div>
   </section>
 </Base>
@@ -148,78 +127,80 @@ const filters = [
 <script>
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Trip filters: dim routes and hide feature spreads that do not match.
-  const chips = document.querySelectorAll<HTMLButtonElement>('.chip');
-  chips.forEach((chip) => chip.addEventListener('click', () => {
-    const filter = chip.dataset.filter ?? 'all';
-    chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
-    const matches = (el: HTMLElement) => filter === 'all' || (el.dataset.tags ?? '').split(' ').includes(filter);
-    document.querySelectorAll<HTMLElement>('.route').forEach((r) => r.classList.toggle('dim', !matches(r)));
-    document.querySelectorAll<HTMLElement>('.feature').forEach((f) => { f.hidden = !matches(f); });
-  }));
+  // Spreads: arrows, counter and keyboard. Native scroll-snap does the swiping.
+  const track = document.getElementById('spreads')!;
+  const spreads = Array.from(track.children) as HTMLElement[];
+  const prev = document.getElementById('prev') as HTMLButtonElement;
+  const next = document.getElementById('next') as HTMLButtonElement;
+  const count = document.getElementById('count')!;
+  let current = 0;
+  const offsetOf = (el: HTMLElement) => el.offsetLeft - track.offsetLeft - parseFloat(getComputedStyle(track).scrollPaddingLeft || '0');
+  const goTo = (i: number) => {
+    current = Math.max(0, Math.min(spreads.length - 1, i));
+    track.scrollTo({ left: offsetOf(spreads[current]), behavior: reduceMotion ? 'auto' : 'smooth' });
+  };
+  const sync = () => {
+    let best = 0, distance = Infinity;
+    spreads.forEach((s, i) => { const d = Math.abs(offsetOf(s) - track.scrollLeft); if (d < distance) { distance = d; best = i; } });
+    current = best;
+    count.textContent = `${current + 1} / ${spreads.length}`;
+    prev.disabled = current === 0;
+    next.disabled = current === spreads.length - 1;
+  };
+  prev.addEventListener('click', () => goTo(current - 1));
+  next.addEventListener('click', () => goTo(current + 1));
+  track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+  track.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+  });
+  sync();
 
-  // Destination search: shows every destination on focus, narrows as you type.
-  const searchForm = document.getElementById('search') as HTMLFormElement | null;
-  const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
-  const results = document.getElementById('search-results');
-  const status = document.getElementById('search-status');
-  if (searchForm && searchInput && results && status) {
-    const items = Array.from(results.querySelectorAll<HTMLLIElement>('li[data-search]'));
-    const empty = document.getElementById('search-empty');
-    const update = () => {
-      const terms = searchInput.value.toLowerCase().split(/\s+/).filter(Boolean);
-      let shown = 0;
-      items.forEach((li) => {
-        const match = terms.every((term) => (li.dataset.search ?? '').includes(term));
-        li.hidden = !match;
-        if (match) shown++;
-      });
-      results.hidden = false;
-      if (empty) empty.hidden = shown > 0;
-      status.textContent = shown ? `${shown} destination${shown === 1 ? '' : 's'} found` : 'No destinations found';
-    };
-    searchInput.addEventListener('focus', update);
-    searchInput.addEventListener('input', update);
-    searchForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const first = items.find((li) => !li.hidden)?.querySelector('a');
-      if (first) location.href = first.href;
-    });
-    document.addEventListener('click', (event) => {
-      if (!searchForm.contains(event.target as Node)) { results.hidden = true; status.textContent = ''; }
-    });
-    searchInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') { results.hidden = true; status.textContent = ''; }
-      if (event.key === 'ArrowDown') { event.preventDefault(); items.find((li) => !li.hidden)?.querySelector('a')?.focus(); }
-    });
-    results.addEventListener('keydown', (event) => {
-      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
-      event.preventDefault();
-      const links = items.filter((li) => !li.hidden).map((li) => li.querySelector('a')!);
-      const i = links.indexOf(document.activeElement as HTMLAnchorElement);
-      const next = event.key === 'ArrowDown' ? links[i + 1] : links[i - 1];
-      (next ?? searchInput).focus();
-    });
-  }
+  // On this page, tour links open the tour's spread. Modified clicks still open the tour page.
+  document.addEventListener('click', (e) => {
+    const link = (e.target as Element).closest<HTMLAnchorElement>('[data-go]');
+    if (!link || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    document.getElementById('issue')!.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    setTimeout(() => goTo(Number(link.dataset.go)), reduceMotion ? 0 : 450);
+  });
 
-  // Split-flap "next departure" board.
-  const flaps = document.getElementById('flaps');
-  if (flaps) {
-    const words = (flaps.dataset.words ?? '').split(',');
-    const width = Math.max(...words.map((w) => w.length));
-    const cells = Array.from({ length: width }, () => flaps.appendChild(Object.assign(document.createElement('span'), { className: 'flap' })));
-    const show = (word: string) => {
-      const padded = word.padEnd(width, ' ');
-      cells.forEach((cell, i) => {
-        if (reduceMotion) { cell.textContent = padded[i]; return; }
-        setTimeout(() => {
-          cell.classList.add('flip');
-          setTimeout(() => { cell.textContent = padded[i]; cell.classList.remove('flip'); }, 140);
-        }, i * 70);
-      });
-    };
-    let index = 0;
-    show(words[0]);
-    if (!reduceMotion) setInterval(() => show(words[++index % words.length]), 3200);
-  }
+  // Destination search: lists every destination on focus and narrows as you type.
+  const form = document.getElementById('search') as HTMLFormElement;
+  const input = document.getElementById('q') as HTMLInputElement;
+  const results = document.getElementById('results')!;
+  const none = document.getElementById('no-results')!;
+  const status = document.getElementById('status')!;
+  const items = Array.from(results.querySelectorAll<HTMLLIElement>('li[data-search]'));
+  const render = () => {
+    const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    items.forEach((li) => { li.hidden = !terms.every((t) => (li.dataset.search ?? '').includes(t)); if (!li.hidden) shown++; });
+    none.hidden = shown > 0;
+    results.hidden = false;
+    status.textContent = `${shown} destinations found`;
+  };
+  const close = () => { results.hidden = true; };
+  input.addEventListener('focus', render);
+  input.addEventListener('input', render);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowDown') { e.preventDefault(); items.find((li) => !li.hidden)?.querySelector('a')?.focus(); }
+  });
+  results.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    const links = items.filter((li) => !li.hidden).map((li) => li.querySelector('a')!);
+    const i = links.indexOf(document.activeElement as HTMLAnchorElement);
+    (links[e.key === 'ArrowDown' ? i + 1 : i - 1] ?? input).focus();
+  });
+  form.addEventListener('submit', (e) => { e.preventDefault(); items.find((li) => !li.hidden)?.querySelector('a')?.click(); });
+  document.addEventListener('click', (e) => { const t = e.target as Element; if (!form.contains(t) || t.closest('.results a')) close(); });
+
+  // The header search icon focuses the search box.
+  document.querySelector('[data-search-link]')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('contents')!.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    setTimeout(() => input.focus({ preventScroll: true }), reduceMotion ? 0 : 500);
+  });
 </script>

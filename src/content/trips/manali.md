@@ -8,17 +8,16 @@ nights: 6N/7D
 price: 14999
 bestFor: Adventure and snow
 tags: [snow, adventure, budget]
-color: "#14A86E"
-onColor: "#0B0D12"
-background: "#0D1F17"
-foreground: "#FFFFFF"
+color: "#4E7A62"
+page: 36
+summary: Solang, the Atal Tunnel and Old Manali
+best: Oct–Jun
+highest: Atal Tunnel, 3,060 m
 stops: [Manali, Atal Tunnel, Solang]
-busSeconds: 9.5
-kicker: The Manali issue · 6N / 7D
-title: Jump off a mountain. Legally.
-dek: Paragliding in Solang, the long glow of the Atal Tunnel, and cafés where nobody checks the time.
-hero: ../../assets/photos/manali-paragliding.jpg
-heroAlt: A paraglider over the green Solang Valley
+title: Mountains, at your own pace.
+dek: Paragliding over Solang, the long road through the Atal Tunnel, and cafés where nobody checks the time.
+hero: ../../assets/photos/manali-paraglider.jpg
+heroAlt: A paraglider over snowy pine forests near Manali
 place: Solang Valley, Manali
 includes:
   - Train and bus travel
@@ -50,12 +49,12 @@ days:
     title: Back to Rourkela
     text: Overnight bus out of the mountains and on your way home.
 gallery:
-  - src: ../../assets/photos/manali-solang-snow.jpg
-    alt: Solang Valley under deep snow
-    caption: Solang in January
-  - src: ../../assets/photos/manali-valley.jpg
-    alt: Pine trees and snowy peaks above Solang Valley
-    caption: Solang Valley
+  - src: ../../assets/photos/manali-peaks.jpg
+    alt: Snow-covered peaks above the Kullu valley
+    caption: Snow peaks above Manali
+  - src: ../../assets/photos/manali-town.jpg
+    alt: Manali town below snow-covered mountains
+    caption: Manali town
 ---
 
 Manali is where a lot of people take their first real trip with friends. Seven days, a group, and a valley that has something for every kind of brave.

@@ -16,7 +16,7 @@ npm run build    # static site in dist/
 
 Each trip is one Markdown file in `src/content/trips/`. Copy an existing file, change the details, and add photos to `src/assets/photos/`. The home page, route map and trip page update by themselves.
 
-`src/data/credits.json` lists the source and licence of each photo.
+`src/data/photo-sources.json` lists where each photo came from. All photos use the Unsplash License, which needs no credit.
 
 ## Deploy
 

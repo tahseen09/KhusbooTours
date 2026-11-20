@@ -1,0 +1,7 @@
+---
+interface Props { stops: string[]; }
+const { stops } = Astro.props;
+---
+<div class="line" role="img" aria-label={`Route: ${stops.join(', ')}`}>
+  <span class="stops" aria-hidden="true">{stops.map((s) => <span class="stop">{s}</span>)}</span>
+</div>
