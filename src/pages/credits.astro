@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import credits from '../data/credits.json';
+---
+<Base title="Photo credits · Khusboo Tours" description="Credits for the photos used on the Khusboo Tours website." backLink>
+  <section class="page">
+    <div class="wrap">
+      <h1>Photo credits</h1>
+      <p class="lead">The photos on this site come from Wikimedia Commons. Thank you to the photographers who share their work.</p>
+      <ul class="credits">
+        {credits.map((c) => (
+          <li>
+            <a href={c.source} target="_blank" rel="noopener">{c.title.replace(/\.(jpe?g|png)$/i, '')}</a>
+            <span class="mono">{c.artist} · {c.license}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/site';
+---
+<Base title="Page not found · Khusboo Tours" description="This page does not exist." backLink>
+  <section class="page">
+    <div class="wrap">
+      <span class="eyebrow soft">Error 404</span>
+      <h1>Wrong platform.</h1>
+      <p class="lead">This page does not exist. Every trip leaves from the home page.</p>
+      <a class="btn-wa" style="max-width:320px;background:var(--ink);color:var(--paper)" href={withBase('')}>See all trips</a>
+    </div>
+  </section>
+</Base>

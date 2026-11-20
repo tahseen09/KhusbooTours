@@ -1,0 +1,108 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { Picture } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import BoardingPass from '../../components/BoardingPass.astro';
+import WhatsAppIcon from '../../components/WhatsAppIcon.astro';
+import { formatPrice, whatsappLink, withBase } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const trips = (await getCollection('trips')).sort((a, b) => a.data.order - b.data.order);
+  return trips.map((trip) => ({ params: { slug: trip.id }, props: { trip, others: trips.filter((t) => t.id !== trip.id) } }));
+}
+
+interface Props { trip: CollectionEntry<'trips'>; others: CollectionEntry<'trips'>[]; }
+const { trip, others } = Astro.props;
+const t = trip.data;
+const { Content } = await render(trip);
+const bookMessage = `Hi Khusboo Tours, I want to book the ${t.name} trip (${t.nights}).`;
+---
+<Base
+  title={`${t.name} tour from Rourkela · ${t.nights} from ${formatPrice(t.price)} · Khusboo Tours`}
+  description={`${t.name} tour package from Rourkela, ${t.nights}, from ${formatPrice(t.price)} per person. ${t.dek}`}
+  ogImage={t.hero.src}
+  backLink
+>
+  <div style={`--c:${t.color};--on:${t.onColor}`}>
+    <section class="trip-hero">
+      <div class="hero-img"><Picture src={t.hero} alt={t.heroAlt} formats={['avif', 'webp']} widths={[480, 800, 1200, 1920]} sizes="100vw" loading="eager" fetchpriority="high" /></div>
+      <div class="wrap">
+        <span class="code">LINE {t.code} · {t.name.toUpperCase()}</span>
+        <h1>{t.title}</h1>
+        <p>{t.dek}</p>
+      </div>
+    </section>
+
+    <section class="facts" aria-label="Trip facts">
+      <dl class="wrap" style="padding-inline:0">
+        <div><dt>Duration</dt><dd>{t.nights}</dd></div>
+        <div><dt>From</dt><dd>{formatPrice(t.price)}</dd></div>
+        <div><dt>Best for</dt><dd>{t.bestFor}</dd></div>
+      </dl>
+    </section>
+
+    <section class="trip-body">
+      <div class="wrap trip-cols">
+        <div class="itinerary">
+          <div class="story"><Content /></div>
+          <span class="eyebrow" style="display:block;margin-top:40px">The route · {t.days.length} stops</span>
+          <h2>Day by day</h2>
+          <ol class="days">
+            {t.days.map((d, i) => (
+              <li class="day">
+                <span class="day-line" aria-hidden="true"></span>
+                <div class="day-body">
+                  <span class="mono">DAY {i + 1} · {d.place.toUpperCase()}</span>
+                  <h3>{d.title}</h3>
+                  <p>{d.text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p class="note">Day plans can change with weather, roads and permits. We confirm the final plan on WhatsApp before you pay.</p>
+        </div>
+        <aside class="trip-incl">
+          <span class="eyebrow">In your ticket</span>
+          <h2>Included</h2>
+          <ul>
+            {t.includes.map((item) => (
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>{item}</li>
+            ))}
+          </ul>
+          <div class="trip-pass"><BoardingPass trip={t} /></div>
+        </aside>
+      </div>
+    </section>
+
+    {t.gallery.length > 0 && (
+      <section class="gallery" aria-label={`${t.name} photos`}>
+        {t.gallery.map((g) => (
+          <figure>
+            <Picture src={g.src} alt={g.alt} formats={['avif', 'webp']} widths={[480, 800, 1200]} sizes="(min-width: 900px) 33vw, 100vw" loading="lazy" />
+            <figcaption>{g.caption}</figcaption>
+          </figure>
+        ))}
+      </section>
+    )}
+
+    <section class="more-trips">
+      <div class="wrap">
+        <h2>Other lines from Rourkela</h2>
+        <div class="more-list">
+          {others.map(({ id, data: o }) => (
+            <a href={withBase(`trips/${id}/`)} style={`--c:${o.color};--on:${o.onColor}`}>
+              <span class="code">{o.code}</span>
+              <b>{o.name}</b>
+              <span class="mono" style="font-size:13px">{o.nights} · from {formatPrice(o.price)}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <div class="book-bar">
+      <div><span class="lbl">FROM / PERSON</span><b>{formatPrice(t.price)}</b></div>
+      <a class="btn-wa" href={whatsappLink(bookMessage)} target="_blank" rel="noopener"><WhatsAppIcon /> Book on WhatsApp</a>
+    </div>
+  </div>
+</Base>

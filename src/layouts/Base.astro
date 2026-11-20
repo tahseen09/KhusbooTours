@@ -1,0 +1,80 @@
+---
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
+import '../styles/global.css';
+import WhatsAppIcon from '../components/WhatsAppIcon.astro';
+import { PHONE_DISPLAY, whatsappLink, withBase } from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  backLink?: boolean;
+}
+const { title, description, ogImage, backLink = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const navTrips = [
+  { href: 'trips/kashmir/', label: 'Kashmir' },
+  { href: 'trips/gangtok/', label: 'Gangtok' },
+  { href: 'trips/manali/', label: 'Manali' },
+  { href: 'trips/goa/', label: 'Goa' },
+];
+---
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
+    <meta name="theme-color" content="#0B0D12" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <header class="mast">
+      {backLink
+        ? <a class="back-link" href={withBase('#lines')}>← All trips</a>
+        : <a class="mast-logo" href={withBase('')}><b>KHUSBOO</b><span class="eyebrow">Issue 01 · Winter 26</span></a>}
+      <nav aria-label="Trips">
+        {navTrips.map((t) => <a href={withBase(t.href)}>{t.label}</a>)}
+      </nav>
+      {backLink && <a class="mast-logo" href={withBase('')}><b>KHUSBOO</b></a>}
+    </header>
+
+    <main><slot /></main>
+
+    <footer class="site-foot">
+      <div class="wrap">
+        <strong>KHUSBOO</strong>
+        <span>Anand Bhawan Lane, Main Road, Rourkela, Odisha 769001</span>
+        <span>support@khusbootours.in · {PHONE_DISPLAY}</span>
+        <nav aria-label="Footer">
+          {navTrips.map((t) => <a href={withBase(t.href)}>{t.label}</a>)}
+          <a href={withBase('credits/')}>Photo credits</a>
+        </nav>
+        <span class="mono" style="font-size:11px">GSTIN 21AFZPA6890C1ZE</span>
+      </div>
+    </footer>
+
+    {!backLink && <a class="fab" id="fab" href={whatsappLink()} target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><WhatsAppIcon /></a>}
+
+    <script>
+      const fab = document.getElementById('fab');
+      const hero = document.querySelector('.cover, .trip-hero');
+      if (fab && hero) {
+        new IntersectionObserver(([entry]) => fab.classList.toggle('show', !entry.isIntersecting)).observe(hero);
+      } else {
+        fab?.classList.add('show');
+      }
+    </script>
+  </body>
+</html>
