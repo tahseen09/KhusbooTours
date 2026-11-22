@@ -5,17 +5,17 @@ name: Gangtok
 city: Bagdogra
 iata: IXB
 nights: 5N/6D
-price: 16999
 bestFor: Mountains and lakes
 tags: [snow, adventure]
-color: "#76679A"
-page: 24
-summary: Tsomgo Lake, Nathula and monasteries
-best: Oct–May
-highest: Nathula, 4,310 m
+color: "#9B4DFF"
+onColor: "#FFFFFF"
+background: "#F1F3F0"
+foreground: "#0B0D12"
 stops: [Gangtok, Tsomgo Lake, Nathula]
+busSeconds: 8
+kicker: The Sikkim issue · 5N / 6D
 title: Above the clouds, on purpose.
-dek: Prayer flags, quiet monasteries and a mountain road to Nathula that climbs past the cloud line.
+dek: Prayer flags, momos on MG Marg, and a road to the Nathula border that climbs past the cloud line.
 hero: ../../assets/photos/sikkim-tsomgo.jpg
 heroAlt: A still mountain lake reflecting snowy ridges in Sikkim
 place: Tsomgo Lake, Sikkim

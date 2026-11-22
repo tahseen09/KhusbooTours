@@ -5,17 +5,17 @@ name: Goa
 city: Goa
 iata: GOX
 nights: 4N/5D
-price: 11999
 bestFor: Beaches and sunsets
-tags: [beach, budget]
-color: "#B8693F"
-page: 48
-summary: Beaches, old churches and a sunset cruise
-best: Nov–Feb
-highest: Sea level
+tags: [beach]
+color: "#FF5A1F"
+onColor: "#0B0D12"
+background: "#1E0F0A"
+foreground: "#FFFFFF"
 stops: [North Goa, Old Goa, South Goa]
+busSeconds: 7
+kicker: The Goa issue · 4N / 5D
 title: Sunsets are better together.
-dek: Old churches, spice farms, a river cruise at dusk and the quiet beaches of South Goa.
+dek: Old churches, spice farms, jet skis, a river cruise at sunset, and the slow ride back from South Goa with the windows down.
 hero: ../../assets/photos/goa-beach-hill.jpg
 heroAlt: A wide sandy beach with a green headland in Goa
 place: A quiet beach in Goa

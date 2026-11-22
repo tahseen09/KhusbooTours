@@ -1,12 +1,11 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
-import Photo from '../../components/Photo.astro';
 import { getImage } from 'astro:assets';
+import Photo from '../../components/Photo.astro';
 import Base from '../../layouts/Base.astro';
 import BoardingPass from '../../components/BoardingPass.astro';
-import RouteLine from '../../components/RouteLine.astro';
 import WhatsAppIcon from '../../components/WhatsAppIcon.astro';
-import { formatPrice, whatsappLink, withBase } from '../../lib/site';
+import { tourMessage, whatsappLink, withBase } from '../../lib/site';
 
 export async function getStaticPaths() {
   const trips = (await getCollection('trips')).sort((a, b) => a.data.order - b.data.order);
@@ -16,45 +15,45 @@ export async function getStaticPaths() {
 interface Props { trip: CollectionEntry<'trips'>; others: CollectionEntry<'trips'>[]; }
 const { trip, others } = Astro.props;
 const t = trip.data;
+const og = await getImage({ src: t.hero, width: 1200, format: 'jpg', quality: 70 });
 const { Content } = await render(trip);
-const ogImage = await getImage({ src: t.hero, width: 1200, format: 'jpg', quality: 70 });
-const nights = (n: string) => n.replace('/', ' / ');
+const bookMessage = tourMessage(t.name, t.nights);
 ---
 <Base
-  title={`${t.name} tour from Rourkela · ${nights(t.nights)} from ${formatPrice(t.price)} · Khusboo Tours`}
-  description={`${t.name} tour package from Rourkela, ${t.nights}, from ${formatPrice(t.price)} per person. ${t.dek}`}
-  ogImage={ogImage.src}
-  showFab={false}
+  title={`${t.name} tour from Rourkela · ${t.nights} · Khusboo Tours`}
+  description={`${t.name} tour package from Rourkela, ${t.nights}. ${t.dek}`}
+  ogImage={og.src}
+  backLink
 >
-  <div style={`--c:${t.color}`}>
+  <div style={`--c:${t.color};--on:${t.onColor}`}>
     <section class="trip-hero">
       <div class="hero-img"><Photo src={t.hero} alt={t.heroAlt} sizes="100vw" priority /></div>
       <div class="wrap">
-        <span class="label">The {t.name} tour · {nights(t.nights)}</span>
+        <span class="code">LINE {t.code} · {t.name.toUpperCase()}</span>
         <h1>{t.title}</h1>
         <p>{t.dek}</p>
-        <span class="caption">{t.place}</span>
       </div>
     </section>
 
-    <section class="article">
-      <div class="wrap article-grid">
-        <div class="article-main">
+    <section class="facts" aria-label="Trip facts">
+      <dl class="wrap" style="padding-inline:0">
+        <div><dt>Duration</dt><dd>{t.nights}</dd></div>
+        <div><dt>Best for</dt><dd>{t.bestFor}</dd></div>
+      </dl>
+    </section>
+
+    <section class="trip-body">
+      <div class="wrap trip-cols">
+        <div class="itinerary">
           <div class="story"><Content /></div>
-          <RouteLine stops={t.stops} />
-          <dl class="facts">
-            <div><dt>Duration</dt><dd>{nights(t.nights)}</dd></div>
-            <div><dt>From</dt><dd>{formatPrice(t.price)}</dd></div>
-            <div><dt>Best time</dt><dd>{t.best}</dd></div>
-            <div><dt>Highest point</dt><dd>{t.highest}</dd></div>
-          </dl>
+          <span class="eyebrow" style="display:block;margin-top:40px">The route · {t.days.length} stops</span>
           <h2>Day by day</h2>
           <ol class="days">
             {t.days.map((d, i) => (
               <li class="day">
                 <span class="day-line" aria-hidden="true"></span>
                 <div class="day-body">
-                  <span class="label">Day {i + 1} · {d.place}</span>
+                  <span class="mono">DAY {i + 1} · {d.place.toUpperCase()}</span>
                   <h3>{d.title}</h3>
                   <p>{d.text}</p>
                 </div>
@@ -63,46 +62,48 @@ const nights = (n: string) => n.replace('/', ' / ');
           </ol>
           <p class="note">Day plans can change with weather, roads and permits. We confirm the final plan on WhatsApp before you pay.</p>
         </div>
-        <aside class="aside" aria-label="Book this tour">
-          <BoardingPass trip={t} />
-          <div>
-            <span class="label">Included</span>
-            <ul class="incl-list" style="margin-top:12px">
-              {t.includes.map((item) => (
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>{item}</li>
-              ))}
-            </ul>
-          </div>
+        <aside class="trip-incl">
+          <span class="eyebrow">In your ticket</span>
+          <h2>Included</h2>
+          <ul>
+            {t.includes.map((item) => (
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>{item}</li>
+            ))}
+          </ul>
+          <div class="trip-pass"><BoardingPass trip={t} /></div>
         </aside>
       </div>
     </section>
 
     {t.gallery.length > 0 && (
-      <section class="wrap gallery" aria-label={`${t.name} photos`}>
+      <section class="gallery" aria-label={`${t.name} photos`}>
         {t.gallery.map((g) => (
           <figure>
-            <div class="frame"><Photo src={g.src} alt={g.alt} sizes="(min-width: 1000px) 400px, 100vw" /></div>
+            <Photo src={g.src} alt={g.alt} sizes="(min-width: 900px) 33vw, 100vw" />
             <figcaption>{g.caption}</figcaption>
           </figure>
         ))}
       </section>
     )}
 
-    <section class="more">
+    <section class="more-trips">
       <div class="wrap">
-        <span class="label">Also in this issue</span>
-        <h2>More tours</h2>
-        <ol class="toc">
+        <h2>Other lines from Rourkela</h2>
+        <div class="more-list">
           {others.map(({ id, data: o }) => (
-            <li><a href={withBase(`trips/${id}/`)}><span class="pg">{o.page}</span><b>{o.name}</b><span class="price">from {formatPrice(o.price)}</span><span class="sub">{nights(o.nights)} · {o.summary}</span></a></li>
+            <a href={withBase(`trips/${id}/`)} style={`--c:${o.color};--on:${o.onColor}`}>
+              <span class="code">{o.code}</span>
+              <b>{o.name}</b>
+              <span class="mono" style="font-size:13px">{o.nights}</span>
+            </a>
           ))}
-        </ol>
+        </div>
       </div>
     </section>
 
     <div class="book-bar">
-      <div><span class="label">From</span><b>{formatPrice(t.price)}</b></div>
-      <a class="btn" href={whatsappLink(`Hi Khusboo Tours, I want to book the ${t.name} tour (${t.nights}).`)} target="_blank" rel="noopener"><WhatsAppIcon /> Book on WhatsApp</a>
+      <div><span class="lbl">{t.name.toUpperCase()}</span><b>{t.nights}</b></div>
+      <a class="btn-wa" href={whatsappLink(bookMessage)} target="_blank" rel="noopener"><WhatsAppIcon /> Book on WhatsApp</a>
     </div>
   </div>
 </Base>

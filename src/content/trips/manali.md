@@ -5,17 +5,17 @@ name: Manali
 city: Kullu
 iata: KUU
 nights: 6N/7D
-price: 14999
 bestFor: Adventure and snow
-tags: [snow, adventure, budget]
-color: "#4E7A62"
-page: 36
-summary: Solang, the Atal Tunnel and Old Manali
-best: Oct–Jun
-highest: Atal Tunnel, 3,060 m
+tags: [snow, adventure]
+color: "#14A86E"
+onColor: "#0B0D12"
+background: "#0D1F17"
+foreground: "#FFFFFF"
 stops: [Manali, Atal Tunnel, Solang]
-title: Mountains, at your own pace.
-dek: Paragliding over Solang, the long road through the Atal Tunnel, and cafés where nobody checks the time.
+busSeconds: 9.5
+kicker: The Manali issue · 6N / 7D
+title: Jump off a mountain. Legally.
+dek: Paragliding in Solang, the long glow of the Atal Tunnel, and cafés where nobody checks the time.
 hero: ../../assets/photos/manali-paraglider.jpg
 heroAlt: A paraglider over snowy pine forests near Manali
 place: Solang Valley, Manali

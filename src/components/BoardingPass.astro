@@ -1,25 +1,29 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import WhatsAppIcon from './WhatsAppIcon.astro';
-import { formatPrice, whatsappLink } from '../lib/site';
+import { tourMessage, whatsappLink } from '../lib/site';
 
 interface Props { trip: CollectionEntry<'trips'>['data']; }
 const { trip } = Astro.props;
-const message = `Hi Khusboo Tours, I want to book the ${trip.name} tour (${trip.nights}).`;
+const message = tourMessage(trip.name, trip.nights);
 ---
-<div class="pass">
-  <div class="pass-top"><span class="label">Boarding pass</span><span class="label">Khusboo Tours</span></div>
-  <div class="pass-route">
-    <div><span class="pass-code">ROU</span><span class="pass-city">Rourkela</span></div>
-    <svg viewBox="0 0 120 14" fill="none" stroke="currentColor" stroke-width="1.5" preserveAspectRatio="none" aria-hidden="true"><path d="M2 7h112" stroke-dasharray="2 5"/><path d="M110 2l6 5-6 5"/></svg>
-    <div><span class="pass-code">{trip.iata}</span><span class="pass-city">{trip.city}</span></div>
-  </div>
-  <dl class="facts">
-    <div><dt>Duration</dt><dd>{trip.nights.replace('/', ' / ')}</dd></div>
-    <div><dt>Best time</dt><dd>{trip.best}</dd></div>
-  </dl>
-  <div class="pass-foot">
-    <div class="pass-price"><span class="label">From, per person</span><b>{formatPrice(trip.price)}</b></div>
-    <a class="btn" href={whatsappLink(message)} target="_blank" rel="noopener"><WhatsAppIcon /> Book on WhatsApp</a>
+<div class="pass-wrap">
+  <div class="pass">
+    <div class="pass-top"><span>BOARDING PASS</span><span>KHUSBOO TOURS · {trip.code}</span></div>
+    <div class="pass-route">
+      <div><span class="lbl">FROM</span><span class="iata">ROU</span><span class="pass-city">Rourkela</span></div>
+      <svg viewBox="0 0 64 22" fill="none" stroke="#0B0D12" stroke-width="1.6" aria-hidden="true"><path d="M2 11h56" stroke-dasharray="3 4"/><path d="M30 11l-6-6h3l7 6-7 6h-3z" fill="#0B0D12" stroke="none"/></svg>
+      <div><span class="lbl">TO</span><span class="iata">{trip.iata}</span><span class="pass-city">{trip.city}</span></div>
+    </div>
+    <div class="pass-meta">
+      <span><span class="lbl">DURATION</span><b>{trip.nights}</b></span>
+      <span><span class="lbl">PASSENGER</span><b>YOU</b></span>
+      <span><span class="lbl">CLASS</span><b>ESCAPE</b></span>
+    </div>
+    <div class="perf"></div>
+    <div class="pass-foot">
+      <span class="barcode" aria-hidden="true"></span>
+      <a class="btn-wa" href={whatsappLink(message)} target="_blank" rel="noopener"><WhatsAppIcon /> Book this seat on WhatsApp</a>
+    </div>
   </div>
 </div>

@@ -5,17 +5,17 @@ name: Kashmir
 city: Srinagar
 iata: SXR
 nights: 5N/6D
-price: 21999
 bestFor: Snow and houseboats
 tags: [snow]
-color: "#3D5A80"
-page: 12
-summary: Houseboats, Gulmarg snow and Sonmarg
-best: Dec–Feb for snow
-highest: Gulmarg, 2,650 m
+color: "#2F5BFF"
+onColor: "#FFFFFF"
+background: "#0E1733"
+foreground: "#FFFFFF"
 stops: [Srinagar, Gulmarg, Sonmarg, Dal Lake]
+busSeconds: 11
+kicker: The Kashmir issue · 5N / 6D
 title: Sleep on the water. Wake up in snow.
-dek: A houseboat on Dal Lake, a gondola up Gulmarg and the glacier light of Sonmarg. Six days that feel like a month.
+dek: A houseboat on Dal Lake, a gondola up Gulmarg, and Sonmarg’s glacier light. Six days that feel like a month.
 hero: ../../assets/photos/kashmir-shikaras.jpg
 heroAlt: Shikaras crossing Dal Lake on a misty morning
 place: Dal Lake, Srinagar

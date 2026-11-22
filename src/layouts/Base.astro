@@ -1,10 +1,8 @@
 ---
-import '@fontsource/cormorant-garamond/latin-300.css';
-import '@fontsource/cormorant-garamond/latin-300-italic.css';
-import '@fontsource/cormorant-garamond/latin-400.css';
-import '@fontsource/cormorant-garamond/latin-400-italic.css';
-import '@fontsource/cormorant-garamond/latin-500.css';
-import '@fontsource-variable/inter';
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
 import '../styles/global.css';
 import WhatsAppIcon from '../components/WhatsAppIcon.astro';
 import { PHONE_DISPLAY, whatsappLink, withBase } from '../lib/site';
@@ -13,17 +11,15 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
-  /** Pages without a photo hero need dark header text. */
-  onPaper?: boolean;
-  showFab?: boolean;
+  backLink?: boolean;
 }
-const { title, description, ogImage, onPaper = false, showFab = true } = Astro.props;
+const { title, description, ogImage, backLink = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const navTrips = [
-  { slug: 'kashmir', label: 'Kashmir' },
-  { slug: 'gangtok', label: 'Gangtok' },
-  { slug: 'manali', label: 'Manali' },
-  { slug: 'goa', label: 'Goa' },
+  { href: 'trips/kashmir/', label: 'Kashmir' },
+  { href: 'trips/gangtok/', label: 'Gangtok' },
+  { href: 'trips/manali/', label: 'Manali' },
+  { href: 'trips/goa/', label: 'Goa' },
 ];
 ---
 <!doctype html>
@@ -35,7 +31,7 @@ const navTrips = [
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
-    <meta name="theme-color" content="#FAF9F6" />
+    <meta name="theme-color" content="#0B0D12" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -44,33 +40,51 @@ const navTrips = [
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
-    <header class:list={['mast', { 'on-paper': onPaper }]}>
-      <a class="mini-logo" href={withBase('')} aria-label="Khusboo Tours home">K</a>
-      <nav aria-label="Main">
-        {navTrips.map((t, i) => <a class="tour-link" href={withBase(`trips/${t.slug}/`)} data-go={i}>{t.label}</a>)}
-        <a class="tours-btn" href={withBase('#contents')}>All tours</a>
-        <a class="icon-btn" href={withBase('#contents')} data-search-link aria-label="Search destinations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></a>
-      </nav>
+    <header class="mast">
+      {backLink
+        ? <a class="back-link" href={withBase('#lines')}>← All trips</a>
+        : <a class="mast-logo" href={withBase('')}><b>KHUSBOO</b><span class="eyebrow">Issue 01</span></a>}
+      <div class="mast-right">
+        <nav aria-label="Trips">
+          {navTrips.map((t) => <a href={withBase(t.href)}>{t.label}</a>)}
+        </nav>
+        <a class="mast-search" href={withBase('#lines')} aria-label="Search destinations" data-search-link><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></a>
+        {backLink && <a class="mast-logo" href={withBase('')}><b>KHUSBOO</b></a>}
+      </div>
     </header>
 
     <main><slot /></main>
 
     <footer class="site-foot">
       <div class="wrap">
-        <strong>KHUSBOO TOURS</strong>
+        <strong>KHUSBOO</strong>
         <span>Anand Bhawan Lane, Main Road, Rourkela, Odisha 769001</span>
-        <span>support@khusbootours.in · {PHONE_DISPLAY} · GSTIN 21AFZPA6890C1ZE</span>
-        <nav aria-label="Tours">{navTrips.map((t) => <a href={withBase(`trips/${t.slug}/`)}>{t.label}</a>)}</nav>
+        <span>support@khusbootours.in · {PHONE_DISPLAY}</span>
+        <nav aria-label="Footer">
+          {navTrips.map((t) => <a href={withBase(t.href)}>{t.label}</a>)}
+        </nav>
+        <span class="mono" style="font-size:11px">GSTIN 21AFZPA6890C1ZE</span>
       </div>
     </footer>
 
-    {showFab && <a class="fab" id="fab" href={whatsappLink()} target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><WhatsAppIcon /></a>}
+    {!backLink && <a class="fab" id="fab" href={whatsappLink()} target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><WhatsAppIcon /></a>}
 
     <script>
+      // On the home page the search icon jumps to the search box and focuses it.
+      const searchInput = document.getElementById('search-input');
+      document.querySelector('[data-search-link]')?.addEventListener('click', (event) => {
+        if (!searchInput) return;
+        event.preventDefault();
+        document.getElementById('lines')?.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => searchInput.focus({ preventScroll: true }), 400);
+      });
       const fab = document.getElementById('fab');
       const hero = document.querySelector('.cover, .trip-hero');
-      if (fab && hero) new IntersectionObserver(([entry]) => fab.classList.toggle('show', !entry.isIntersecting)).observe(hero);
-      else fab?.classList.add('show');
+      if (fab && hero) {
+        new IntersectionObserver(([entry]) => fab.classList.toggle('show', !entry.isIntersecting)).observe(hero);
+      } else {
+        fab?.classList.add('show');
+      }
     </script>
   </body>
 </html>
