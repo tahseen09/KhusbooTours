@@ -1,0 +1,42 @@
+---
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import { reserveBusMessage, whatsappLink } from '../lib/site';
+
+const buses = [
+  { name: 'AC', layout: 'seats', air: 'closed', text: 'Cool and quiet, for hot days and long drives.' },
+  { name: 'Non-AC', layout: 'seats', air: 'open', text: 'Open windows and fresh air, for day trips and big groups.' },
+  { name: 'Sleeper', layout: 'berths', air: 'closed', text: 'Berths to lie down on, for overnight journeys.' },
+];
+---
+<section class="reserve" id="reserve" aria-labelledby="reserve-h">
+  <div class="wrap">
+    <span class="eyebrow">Reserve a bus</span>
+    <h2 id="reserve-h">Our fleet. <span class="soft">Your whole gang.</span></h2>
+    <p class="section-lead">We own a fleet of different buses: AC, Non-AC, Sleeper and more. Reserve one for a wedding, pilgrimage, picnic, college tour or family trip.</p>
+    <ul class="fleet">
+      {buses.map((bus) => (
+        <li>
+          <a href={whatsappLink(reserveBusMessage(bus.name))} target="_blank" rel="noopener">
+            <svg class:list={['fleet-bus', bus.air]} viewBox="0 0 240 100" aria-hidden="true">
+              <rect class="coach" x="4" y="14" width="232" height="68" rx="14" />
+              {bus.layout === 'berths'
+                ? [24, 45].flatMap((y) => [18, 78, 138].map((x) => <rect class="window" x={x} y={y} width="52" height="15" rx="4" />))
+                : [18, 54, 90, 126, 162].map((x) => <rect class="window" x={x} y="26" width="28" height="26" rx="5" />)}
+              {bus.name === 'AC' && <rect class="coach" x="90" y="5" width="60" height="12" rx="4" />}
+              <path class="window" d="M202 26h18l9 26h-27z" />
+              <circle class="wheel" cx="56" cy="82" r="14" />
+              <circle class="wheel" cx="188" cy="82" r="14" />
+            </svg>
+            <b>{bus.name}</b>
+            <span>{bus.text}</span>
+            <span class="fleet-cta">Ask on WhatsApp →</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="reserve-cta">
+      <p>Need another type or size? Send us your route, date and group size.</p>
+      <a class="btn-wa" href={whatsappLink(reserveBusMessage())} target="_blank" rel="noopener"><WhatsAppIcon /> Reserve on WhatsApp</a>
+    </div>
+  </div>
+</section>

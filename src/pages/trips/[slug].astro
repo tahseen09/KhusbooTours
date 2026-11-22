@@ -4,8 +4,7 @@ import { getImage } from 'astro:assets';
 import Photo from '../../components/Photo.astro';
 import Base from '../../layouts/Base.astro';
 import BoardingPass from '../../components/BoardingPass.astro';
-import WhatsAppIcon from '../../components/WhatsAppIcon.astro';
-import { tourMessage, whatsappLink, withBase } from '../../lib/site';
+import { tourMessage, withBase } from '../../lib/site';
 
 export async function getStaticPaths() {
   const trips = (await getCollection('trips')).sort((a, b) => a.data.order - b.data.order);
@@ -24,22 +23,16 @@ const bookMessage = tourMessage(t.name, t.nights);
   description={`${t.name} tour package from Rourkela, ${t.nights}. ${t.dek}`}
   ogImage={og.src}
   backLink
+  whatsappMessage={bookMessage}
 >
   <div style={`--c:${t.color};--on:${t.onColor}`}>
     <section class="trip-hero">
       <div class="hero-img"><Photo src={t.hero} alt={t.heroAlt} sizes="100vw" priority /></div>
       <div class="wrap">
-        <span class="code">LINE {t.code} · {t.name.toUpperCase()}</span>
+        <span class="code">LINE {t.code} · {t.name.toUpperCase()} · {t.nights}</span>
         <h1>{t.title}</h1>
         <p>{t.dek}</p>
       </div>
-    </section>
-
-    <section class="facts" aria-label="Trip facts">
-      <dl class="wrap" style="padding-inline:0">
-        <div><dt>Duration</dt><dd>{t.nights}</dd></div>
-        <div><dt>Best for</dt><dd>{t.bestFor}</dd></div>
-      </dl>
     </section>
 
     <section class="trip-body">
@@ -63,6 +56,7 @@ const bookMessage = tourMessage(t.name, t.nights);
           <p class="note">Day plans can change with weather, roads and permits. We confirm the final plan on WhatsApp before you pay.</p>
         </div>
         <aside class="trip-incl">
+          <div class="trip-pass"><BoardingPass trip={t} showBestFor /></div>
           <span class="eyebrow">In your ticket</span>
           <h2>Included</h2>
           <ul>
@@ -70,7 +64,6 @@ const bookMessage = tourMessage(t.name, t.nights);
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>{item}</li>
             ))}
           </ul>
-          <div class="trip-pass"><BoardingPass trip={t} /></div>
         </aside>
       </div>
     </section>
@@ -101,9 +94,5 @@ const bookMessage = tourMessage(t.name, t.nights);
       </div>
     </section>
 
-    <div class="book-bar">
-      <div><span class="lbl">{t.name.toUpperCase()}</span><b>{t.nights}</b></div>
-      <a class="btn-wa" href={whatsappLink(bookMessage)} target="_blank" rel="noopener"><WhatsAppIcon /> Book on WhatsApp</a>
-    </div>
   </div>
 </Base>

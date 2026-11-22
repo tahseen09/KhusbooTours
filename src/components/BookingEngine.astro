@@ -1,0 +1,50 @@
+---
+import Photo from './Photo.astro';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import { BOOKING_URL, PHONE_DISPLAY, whatsappLink } from '../lib/site';
+import backPhoto from '../assets/photos/sikkim-kanchenjunga.jpg';
+---
+<section class="booking" id="book" aria-labelledby="book-h">
+  <div class="back">
+    <div class="back-img"><Photo src={backPhoto} alt="Kanchenjunga glowing gold at sunrise" sizes="100vw" /></div>
+    <div class="wrap">
+      <span class="eyebrow">Back cover · Open for booking</span>
+      <h2 id="book-h">Your seat is waiting.</h2>
+      <a class="btn-wa" href={whatsappLink()} target="_blank" rel="noopener"><WhatsAppIcon /> Say hi on WhatsApp</a>
+      <span class="phone">or call <a href="tel:+919438836765">{PHONE_DISPLAY}</a>, or book online below</span>
+    </div>
+  </div>
+  <div class="wrap booking-start" id="booking-start" tabindex="-1" aria-label="Online booking" role="region">
+    <div class="booking-picked" id="booking-picked" aria-live="polite" hidden>
+      <div><b id="booking-picked-title"></b><p id="booking-picked-note"></p></div>
+      <a class="btn-wa" id="booking-picked-link" href={whatsappLink()} target="_blank" rel="noopener"><WhatsAppIcon /> Ask on WhatsApp</a>
+    </div>
+    <div class="booking-embed">
+      <div class="booking-window">
+        <!-- No sandbox: seat selection refuses to load in a frame, so the engine must open it in the whole tab. -->
+        <iframe class="booking-frame" src={BOOKING_URL} title="Tour dates, fares and online booking" loading="lazy"></iframe>
+      </div>
+    </div>
+    <p class="booking-help">Booking not showing? <a href={BOOKING_URL} target="_blank" rel="noopener">Open it in a new tab</a>.</p>
+  </div>
+</section>
+
+<script>
+  const frame = document.querySelector<HTMLIFrameElement>('.booking-frame')!;
+  const bookingWindow = frame.parentElement!;
+  // Back can restore the iframe on a tour page, so its first load is not always the listing.
+  const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+  let loads = navigation?.type === 'back_forward' ? 1 : 0;
+  let inView = false;
+  // Past the first page the engine has its own buttons at the bottom, which the WhatsApp button would cover.
+  const syncFab = () => document.getElementById('fab')?.classList.toggle('away', loads > 1 && inView);
+  frame.addEventListener('load', () => {
+    // Only the engine's first page has the duplicate header that we crop. Later pages show in full.
+    if (++loads > 1) bookingWindow.classList.add('full');
+    syncFab();
+  });
+  new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    syncFab();
+  }, { threshold: 0.5 }).observe(bookingWindow);
+</script>

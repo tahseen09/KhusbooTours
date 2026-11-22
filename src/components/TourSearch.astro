@@ -1,0 +1,144 @@
+---
+import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
+
+const sorted = (await getCollection('trips')).sort((a, b) => a.data.order - b.data.order);
+const tours = await Promise.all(sorted.map(async ({ id, data: t }) => {
+  const places = [...new Set([...t.stops, ...t.days.map((d) => d.place)])].filter((place) => place !== 'Home');
+  return {
+    id, name: t.name, nights: t.nights, bestFor: t.bestFor, places,
+    thumb: await getImage({ src: t.hero, width: 128, format: 'webp', quality: 50 }),
+    haystack: [t.name, t.city, t.kicker, t.bestFor, t.dek, t.place, ...t.tags, ...places].join(' ').toLowerCase(),
+  };
+}));
+---
+<form class="search" id="search" role="search" action="#booking-start">
+  <div class="search-bar">
+    <div class="search-fields">
+      <label class="search-field">
+        <span>Destination</span>
+        <input id="search-input" type="search" placeholder="Where to?" autocomplete="off" aria-controls="search-results" aria-describedby="search-status" />
+      </label>
+      <button type="submit">Find tour</button>
+    </div>
+    <button class="search-all" id="search-all" type="button">Show all <span aria-hidden="true">↓</span></button>
+  </div>
+  <ul class="search-results" id="search-results" hidden>
+    {tours.map((tour) => (
+      <li data-id={tour.id} data-name={tour.name} data-nights={tour.nights} data-search={tour.haystack} data-places={tour.places.join('|')}>
+        <button type="button">
+          <img src={tour.thumb.src} alt="" width="56" height="56" loading="lazy" />
+          <span><b>{tour.name} tour</b><span class="soft">{tour.nights} · <span data-detail data-default={tour.bestFor}>{tour.bestFor}</span></span></span>
+        </button>
+      </li>
+    ))}
+    <li class="search-empty" id="search-empty" hidden>Not featured here. Press Find tour to check booking.</li>
+  </ul>
+  <p class="visually-hidden" id="search-status" aria-live="polite"></p>
+</form>
+
+<script>
+  import { tourMessage, whatsappLink } from '../lib/site';
+
+  const form = document.getElementById('search') as HTMLFormElement;
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const submit = form.querySelector<HTMLButtonElement>('[type="submit"]')!;
+  const suggestions = document.getElementById('search-results')!;
+  const status = document.getElementById('search-status')!;
+  const empty = document.getElementById('search-empty')!;
+  const items = Array.from(suggestions.querySelectorAll<HTMLLIElement>('li[data-search]'));
+  const start = document.getElementById('booking-start')!;
+  const picked = document.getElementById('booking-picked')!;
+  const pickedTitle = document.getElementById('booking-picked-title')!;
+  const pickedNote = document.getElementById('booking-picked-note')!;
+  const pickedLink = document.getElementById('booking-picked-link') as HTMLAnchorElement;
+
+  const findMatches = () => {
+    const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+    return items.filter((li) => terms.every((term) => li.dataset.search!.includes(term)));
+  };
+
+  const suggest = () => {
+    const matches = findMatches();
+    const query = input.value.trim().toLowerCase();
+    items.forEach((li) => {
+      li.hidden = !matches.includes(li);
+      // A search for a place inside a tour should say why that tour matched.
+      const place = query && li.dataset.places!.split('|').find((p) => p.toLowerCase().includes(query));
+      const detail = li.querySelector<HTMLElement>('[data-detail]')!;
+      detail.textContent = place ? `includes ${place}` : detail.dataset.default!;
+    });
+    suggestions.hidden = false;
+    empty.hidden = matches.length > 0;
+    status.textContent = matches.length ? `${matches.length} tour${matches.length === 1 ? '' : 's'} found` : 'Not featured here. Press Find tour to check booking.';
+  };
+  const close = () => { suggestions.hidden = true; status.textContent = ''; };
+
+  // The engine cannot take a search term, so repeat the search above it and put it in the WhatsApp message.
+  const showSearchAtBooking = () => {
+    const query = input.value.trim();
+    picked.hidden = !query;
+    if (!query) return;
+    const matches = findMatches();
+    const names = matches.map((li) => li.dataset.name).join(', ');
+    let message = `Hi Khusboo Tours, I searched for “${query}”. Can you plan this trip for me?`;
+    if (matches.length === 1) {
+      const { name, nights } = matches[0].dataset;
+      pickedTitle.textContent = `${name} tour · ${nights}`;
+      pickedNote.textContent = 'See if it is open for booking below, or ask us for dates.';
+      message = tourMessage(name!, nights!);
+    } else if (matches.length) {
+      pickedTitle.textContent = `${matches.length} tours for “${query}”`;
+      pickedNote.textContent = `${names}. See which are open below, or ask us to help you choose.`;
+      message = `Hi Khusboo Tours, I searched for “${query}”. Please share the dates and prices for ${names}.`;
+    } else {
+      pickedTitle.textContent = `Looking for “${query}”?`;
+      pickedNote.textContent = 'See if it is open for booking below, or ask us to plan it.';
+    }
+    pickedLink.href = whatsappLink(message);
+  };
+
+  const scrollToTours = () => {
+    document.getElementById('net-h')!.focus({ preventScroll: true });
+    document.getElementById('lines')!.scrollIntoView();
+  };
+
+  items.forEach((li) => li.querySelector('button')!.addEventListener('click', () => {
+    input.value = li.dataset.name!;
+    close();
+    // Focus on the input would open the list and the phone keyboard again.
+    submit.focus({ preventScroll: true });
+  }));
+  input.addEventListener('focus', () => {
+    suggest();
+    // A search ends at the engine, so start its load before the scroll gets there.
+    document.querySelector<HTMLIFrameElement>('.booking-frame')!.loading = 'eager';
+  });
+  input.addEventListener('input', suggest);
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    close();
+    showSearchAtBooking();
+    start.focus({ preventScroll: true });
+    start.scrollIntoView();
+  });
+  document.getElementById('search-all')!.addEventListener('click', () => {
+    input.value = '';
+    picked.hidden = true;
+    close();
+    scrollToTours();
+  });
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element;
+    if (!form.contains(target) && !target.closest('[data-search-link]')) close();
+  });
+  form.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') return close();
+    if (suggestions.hidden || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
+    const options = items.filter((li) => !li.hidden).map((li) => li.querySelector('button')!);
+    const index = options.indexOf(document.activeElement as HTMLButtonElement);
+    const next = event.key === 'ArrowDown' ? options[index + 1] : options[index - 1];
+    event.preventDefault();
+    (next ?? input).focus();
+  });
+</script>

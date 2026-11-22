@@ -1,10 +1,10 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import WhatsAppIcon from './WhatsAppIcon.astro';
-import { tourMessage, whatsappLink } from '../lib/site';
+import { tourMessage, whatsappLink, withBase } from '../lib/site';
 
-interface Props { trip: CollectionEntry<'trips'>['data']; }
-const { trip } = Astro.props;
+interface Props { trip: CollectionEntry<'trips'>['data']; showBestFor?: boolean; }
+const { trip, showBestFor = false } = Astro.props;
 const message = tourMessage(trip.name, trip.nights);
 ---
 <div class="pass-wrap">
@@ -20,10 +20,12 @@ const message = tourMessage(trip.name, trip.nights);
       <span><span class="lbl">PASSENGER</span><b>YOU</b></span>
       <span><span class="lbl">CLASS</span><b>ESCAPE</b></span>
     </div>
+    {showBestFor && <p class="pass-best"><span class="lbl">BEST FOR</span><b>{trip.bestFor}</b></p>}
     <div class="perf"></div>
     <div class="pass-foot">
       <span class="barcode" aria-hidden="true"></span>
       <a class="btn-wa" href={whatsappLink(message)} target="_blank" rel="noopener"><WhatsAppIcon /> Book this seat on WhatsApp</a>
+      <a class="pass-online" href={withBase('#book')}>See dates and book online</a>
     </div>
   </div>
 </div>
