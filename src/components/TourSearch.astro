@@ -12,10 +12,12 @@ const tours = await Promise.all(sorted.map(async ({ id, data: t }) => {
     haystack: [t.name, t.city, t.region, t.kicker, t.bestFor, t.dek, t.place, ...t.tags, ...places].join(' ').toLowerCase(),
   };
 }));
-const destinations = [...tours, ...EXTRA_DESTINATIONS.map((d) => ({
-  ...d, bookingId: undefined, places: [] as string[], thumb: undefined,
+const photos = import.meta.glob<{ default: ImageMetadata }>('../assets/photos/*.jpg');
+const destinations = [...tours, ...await Promise.all(EXTRA_DESTINATIONS.map(async (d) => ({
+  ...d, bookingId: undefined, places: [] as string[],
+  thumb: (await getImage({ src: (await photos[`../assets/photos/${d.photo}.jpg`]()).default, width: 128, format: 'webp', quality: 50 })).src as string | undefined,
   haystack: [d.name, d.region, ...d.aliases].join(' ').toLowerCase(),
-}))];
+})))];
 ---
 <form class="search" id="search" role="search" action="#booking-start">
   <div class="search-bar">

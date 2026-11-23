@@ -63,5 +63,15 @@
     "file": "goa-golden-shore",
     "source": "https://unsplash.com/photos/seashore-during-golden-hour-KMn4VEeEPR8",
     "license": "Unsplash License (no attribution required)"
+  },
+  {
+    "file": "netarhat-sunset",
+    "source": "https://unsplash.com/photos/CWG0PfOV9nk",
+    "license": "Unsplash License (no attribution required)"
+  },
+  {
+    "file": "nepal-pokhara-boats",
+    "source": "https://unsplash.com/photos/RVJbWleR-as",
+    "license": "Unsplash License (no attribution required)"
   }
 ]

@@ -9,8 +9,8 @@ export function whatsappLink(message = 'Hi Khusboo Tours, I want to plan a trip.
 
 // Places we plan trips to that have no magazine article yet. The search lists them under "Plan with us".
 export const EXTRA_DESTINATIONS = [
-  { name: 'Netarhat', region: 'Jharkhand', aliases: ['Netarhart'] },
-  { name: 'Nepal', region: 'International', aliases: ['Kathmandu', 'Pokhara'] },
+  { name: 'Netarhat', region: 'Jharkhand', aliases: ['Netarhart'], photo: 'netarhat-sunset' },
+  { name: 'Nepal', region: 'International', aliases: ['Kathmandu', 'Pokhara'], photo: 'nepal-pokhara-boats' },
 ];
 
 export function tourMessage(name: string, nights?: string) {
