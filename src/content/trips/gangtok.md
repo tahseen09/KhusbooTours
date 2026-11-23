@@ -5,7 +5,6 @@ name: Gangtok
 city: Bagdogra
 region: "Sikkim"
 iata: IXB
-nights: 5N/6D
 bestFor: Mountains and lakes
 tags: [snow, adventure]
 color: "#9B4DFF"
@@ -14,7 +13,7 @@ background: "#F1F3F0"
 foreground: "#0B0D12"
 stops: [Gangtok, Tsomgo Lake, Nathula]
 busSeconds: 8
-kicker: The Sikkim issue · 5N / 6D
+kicker: The Sikkim issue
 title: Above the clouds, on purpose.
 dek: Prayer flags, momos on MG Marg, and a road to the Nathula border that climbs past the cloud line.
 hero: ../../assets/photos/sikkim-tsomgo.jpg

@@ -15,7 +15,6 @@ const trips = defineCollection({
       // The state or country, which the search shows under the name.
       region: z.string(),
       iata: z.string(),
-      nights: z.string(),
       bestFor: z.string(),
       tags: z.array(z.enum(['snow', 'beach', 'adventure'])),
       color: z.string(),

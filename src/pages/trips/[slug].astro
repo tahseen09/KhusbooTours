@@ -4,7 +4,8 @@ import { getImage } from 'astro:assets';
 import Photo from '../../components/Photo.astro';
 import Base from '../../layouts/Base.astro';
 import BoardingPass from '../../components/BoardingPass.astro';
-import { tourMessage, withBase } from '../../lib/site';
+import WhatsAppIcon from '../../components/WhatsAppIcon.astro';
+import { tourMessage, whatsappLink, withBase } from '../../lib/site';
 
 export async function getStaticPaths() {
   const trips = (await getCollection('trips')).sort((a, b) => a.data.order - b.data.order);
@@ -16,11 +17,11 @@ const { trip, others } = Astro.props;
 const t = trip.data;
 const og = await getImage({ src: t.hero, width: 1200, format: 'jpg', quality: 70 });
 const { Content } = await render(trip);
-const bookMessage = tourMessage(t.name, t.nights);
+const bookMessage = tourMessage(t.name);
 ---
 <Base
-  title={`${t.name} tour from Rourkela · ${t.nights} · Khusboo Tours`}
-  description={`${t.name} tour package from Rourkela, ${t.nights}. ${t.dek}`}
+  title={`${t.name} tour from Rourkela · Khusboo Tours`}
+  description={`${t.name} tour package from Rourkela. ${t.dek}`}
   ogImage={og.src}
   backLink
   whatsappMessage={bookMessage}
@@ -29,9 +30,10 @@ const bookMessage = tourMessage(t.name, t.nights);
     <section class="trip-hero">
       <div class="hero-img"><Photo src={t.hero} alt={t.heroAlt} sizes="100vw" priority /></div>
       <div class="wrap">
-        <span class="code">LINE {t.code} · {t.name.toUpperCase()} · {t.nights}</span>
+        <span class="code">LINE {t.code} · {t.name.toUpperCase()}</span>
         <h1>{t.title}</h1>
         <p>{t.dek}</p>
+        <a class="btn-wa" href={whatsappLink(bookMessage)} target="_blank" rel="noopener"><WhatsAppIcon /> Ask for dates on WhatsApp</a>
       </div>
     </section>
 
@@ -40,13 +42,13 @@ const bookMessage = tourMessage(t.name, t.nights);
         <div class="itinerary">
           <div class="story"><Content /></div>
           <span class="eyebrow" style="display:block;margin-top:40px">The route · {t.days.length} stops</span>
-          <h2>Day by day</h2>
+          <h2>The plan</h2>
           <ol class="days">
             {t.days.map((d, i) => (
               <li class="day">
                 <span class="day-line" aria-hidden="true"></span>
                 <div class="day-body">
-                  <span class="mono">DAY {i + 1} · {d.place.toUpperCase()}</span>
+                  <span class="mono">STOP {i + 1} · {d.place.toUpperCase()}</span>
                   <h3>{d.title}</h3>
                   <p>{d.text}</p>
                 </div>
@@ -56,7 +58,7 @@ const bookMessage = tourMessage(t.name, t.nights);
           <p class="note">Day plans can change with weather, roads and permits. We confirm the final plan on WhatsApp before you pay.</p>
         </div>
         <aside class="trip-incl">
-          <div class="trip-pass"><BoardingPass trip={t} showBestFor /></div>
+          <div class="trip-pass"><BoardingPass trip={t} /></div>
           <span class="eyebrow">In your ticket</span>
           <h2>Included</h2>
           <ul>
@@ -85,9 +87,10 @@ const bookMessage = tourMessage(t.name, t.nights);
         <div class="more-list">
           {others.map(({ id, data: o }) => (
             <a href={withBase(`trips/${id}/`)} style={`--c:${o.color};--on:${o.onColor}`}>
+              <Photo src={o.hero} alt="" sizes="(min-width: 900px) 300px, 100vw" />
               <span class="code">{o.code}</span>
               <b>{o.name}</b>
-              <span class="mono" style="font-size:13px">{o.nights}</span>
+              <span class="more-title">{o.title}</span>
             </a>
           ))}
         </div>

@@ -43,14 +43,14 @@ p { margin: 0; }
 .mast .back-link { min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; text-decoration: none; }
 
 /* Cover */
-.cover { --cover-h: clamp(640px, 100svh, 940px); --title: min(clamp(108px, 31vw, 360px), (var(--cover-h) - 470px) / 1.65); position: relative; height: var(--cover-h); overflow: hidden; isolation: isolate; }
+.cover { --cover-h: clamp(640px, 100svh, 940px); --title: min(calc((100vw - 32px) / 3.9), 300px); position: relative; height: var(--cover-h); overflow: hidden; isolation: isolate; }
 .cover-img { position: absolute; inset: 0; z-index: -2; }
 .cover-img img { width: 100%; height: 100%; object-fit: cover; object-position: 45% 50%; animation: kenburns 2.6s cubic-bezier(.2,.7,.2,1) both; }
 .cover::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(11,13,18,.55) 0%, rgba(11,13,18,0) 26%, rgba(11,13,18,0) 48%, rgba(11,13,18,.92) 100%); }
 .cover h1 { position: absolute; top: 70px; left: var(--gutter-l); right: var(--gutter-r); font-weight: 800; font-size: var(--title); line-height: .8; letter-spacing: -.065em; color: var(--paper); }
-.cover h1 .row { display: block; overflow: hidden; padding-bottom: .04em; }
+.cover h1 .row { display: block; overflow: hidden; padding-bottom: .04em; white-space: nowrap; }
 .cover h1 .ch { display: inline-block; animation: rise .9s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i) * 70ms + 200ms); }
-.cover .dek { position: absolute; top: calc(70px + var(--title) * 1.65); right: var(--gutter-r); max-width: 170px; text-align: right; font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.05; animation: fade 1s .9s both; }
+.cover .dek { position: absolute; top: calc(78px + var(--title) * .85); right: var(--gutter-r); max-width: 170px; text-align: right; font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.05; animation: fade 1s .9s both; }
 .cover-foot { position: absolute; z-index: 2; left: var(--gutter-l); right: var(--gutter-r); bottom: 24px; display: grid; gap: 16px; }
 .cover-lines { display: grid; gap: 10px; border-top: 1px solid rgba(255,255,255,.45); padding-top: 14px; }
 .cover-lines a { text-decoration: none; font-weight: 600; font-size: 17px; line-height: 1.2; animation: fade .8s both; animation-delay: calc(var(--i) * 120ms + 1s); }
@@ -67,38 +67,27 @@ p { margin: 0; }
 .network .eyebrow { color: var(--muted); }
 .network h2 { font-weight: 800; font-size: clamp(44px, 9vw, 96px); line-height: .92; letter-spacing: -.045em; margin-top: 14px; }
 .network h2:focus { outline: none; }
-.tour-index { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; margin-top: 22px; }
-.tour-jump { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-height: 60px; padding-block: 8px; border-bottom: 1px solid var(--rule); color: var(--ink); text-decoration: none; }
-.tour-jump b { font-size: 19px; letter-spacing: -.02em; }
-.tour-jump .mono { font-size: 11px; color: var(--muted); }
-.tour-jump:hover b { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .code { font-family: var(--mono); font-weight: 700; font-size: 13px; color: var(--on, #fff); background: var(--c); padding: 4px 8px; border-radius: 4px; }
-.track { position: relative; container-type: inline-size; height: 42px; }
-.track::before { content: ""; position: absolute; left: 0; right: 0; top: 15px; height: 5px; background: var(--c); border-radius: 3px; transform-origin: left; }
-.stops { position: absolute; inset: 0; display: flex; justify-content: space-between; }
-.stop { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; white-space: nowrap; }
-.stop:first-child { align-items: flex-start; }
-.stop:last-child { align-items: flex-end; }
-.stop::before { content: ""; width: 14px; height: 14px; border-radius: 50%; border: 3px solid var(--c); background: var(--bg); margin-top: 10px; }
-.bus { position: absolute; top: 2px; left: 0; width: 30px; height: 20px; color: var(--fg); animation: drive var(--d, 9s) ease-in-out infinite alternate; z-index: 1; }
-.bus svg { width: 100%; height: 100%; }
-.bus .cutout { fill: var(--bg); }
-.bus .rim { stroke: var(--bg); stroke-width: 1.5px; }
-
-/* Feature spreads */
-.feature { position: relative; background: var(--bg); color: var(--fg); overflow: hidden; }
-.feature + .feature { border-top: 1px solid rgba(255,255,255,.08); }
-.f-grid { display: grid; }
-.f-media { position: relative; height: clamp(440px, 120vw, 680px); overflow: hidden; }
-.f-media img { width: 100%; height: 100%; object-fit: cover; }
-.f-media .code { position: absolute; top: 16px; left: var(--gutter-l); z-index: 2; }
-.f-media .place { position: absolute; bottom: 12px; right: var(--gutter-r); font-family: var(--mono); font-size: 10px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
-.f-copy { padding: 30px var(--gutter-r) 44px var(--gutter-l); display: grid; gap: 16px; align-content: start; }
-.f-copy .eyebrow { opacity: .85; }
-.f-copy h3 { font-weight: 800; font-size: clamp(46px, 12vw, 84px); line-height: .9; letter-spacing: -.05em; }
-.f-copy h3 a { text-decoration: none; }
-.f-copy .dek-text { font-family: var(--serif); font-size: 23px; line-height: 1.2; max-width: 34ch; }
-.read { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
+/* Trip cards */
+.tours { background: var(--paper); color: var(--ink); padding-bottom: 48px; }
+.network { padding-bottom: 28px; }
+.cards { display: grid; gap: 16px; }
+.card { position: relative; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; transition: border-color .2s, transform .2s; }
+.card:has(.card-link):hover { border-color: var(--ink); transform: translateY(-2px); }
+.card-media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; }
+.card-media img { width: 100%; height: 100%; object-fit: cover; }
+.card-media .code { position: absolute; top: 12px; left: 12px; }
+.card-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 16px 16px 18px; }
+.card-body .eyebrow { color: var(--muted); }
+.card h3 { font-weight: 800; font-size: 28px; line-height: 1; letter-spacing: -.035em; }
+.card-link { text-decoration: none; }
+.card-link::after { content: ""; position: absolute; inset: 0; }
+.card-body p { font-family: var(--serif); font-size: 19px; line-height: 1.2; }
+.card-actions { margin-top: auto; padding-top: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+/* Above the card link, so the button opens WhatsApp and not the trip. */
+.card-actions .btn-wa { position: relative; z-index: 1; min-height: 46px; font-size: 15px; }
+.card-more { font-weight: 700; }
+.plan-h { margin: 40px 0 14px; color: var(--muted); font-weight: 400; }
 
 /* Boarding pass */
 .pass { margin-top: 8px; background: var(--pass); color: var(--ink); border-radius: 8px; box-shadow: 0 1px 0 rgba(0,0,0,.08), 0 12px 32px rgba(0,0,0,.18); max-width: 420px; }
@@ -177,7 +166,7 @@ p { margin: 0; }
 .incl li svg { width: 26px; height: 26px; }
 
 /* Back cover */
-.back { position: relative; min-height: 520px; display: flex; align-items: flex-end; overflow: hidden; isolation: isolate; }
+.back { position: relative; min-height: 420px; display: flex; align-items: flex-end; overflow: hidden; isolation: isolate; }
 .back-img { position: absolute; inset: 0; z-index: -2; }
 .back-img img { width: 100%; height: 100%; object-fit: cover; }
 .back::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(11,11,13,.05) 0%, rgba(11,11,13,.7) 65%, #0B0B0D 100%); }
@@ -196,7 +185,7 @@ p { margin: 0; }
 
 /* Floating WhatsApp */
 .fab { position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40; width: 58px; height: 58px; border-radius: 50%; background: var(--wa); color: var(--ink); display: grid; place-items: center; box-shadow: 0 10px 26px rgba(0,0,0,.35); transition: transform .35s cubic-bezier(.3,1.5,.5,1); }
-.fab.away { transform: scale(0); visibility: hidden; }
+.fab.away, .fab.near-wa { transform: scale(0); visibility: hidden; }
 .fab svg { width: 28px; height: 28px; }
 
 /* Trip page */
@@ -207,6 +196,7 @@ p { margin: 0; }
 .trip-hero .wrap { width: 100%; padding-block: 32px; display: grid; gap: 14px; }
 .trip-hero .code { justify-self: start; }
 .trip-hero h1 { font-weight: 800; font-size: clamp(50px, 13vw, 128px); line-height: .9; letter-spacing: -.05em; max-width: 14ch; animation: fade .9s .2s both; }
+.trip-hero .btn-wa { justify-self: start; margin-top: 6px; }
 .trip-hero p { font-family: var(--serif); font-size: clamp(21px, 3vw, 28px); line-height: 1.2; max-width: 36ch; animation: fade .9s .4s both; }
 .trip-body { background: var(--paper); color: var(--ink); padding-block: 40px 56px; }
 .trip-cols { display: grid; gap: 48px; }
@@ -237,7 +227,10 @@ p { margin: 0; }
 .more-trips { background: var(--night); padding-block: 48px; }
 .more-trips h2 { font-size: 28px; letter-spacing: -.03em; margin-bottom: 16px; }
 .more-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
-.more-list a { display: grid; gap: 8px; padding: 16px; border: 1px solid rgba(255,255,255,.16); border-radius: 8px; text-decoration: none; min-height: 44px; }
+.more-list a { display: grid; gap: 8px; padding: 0 0 16px; border: 1px solid rgba(255,255,255,.16); border-radius: 8px; overflow: hidden; text-decoration: none; min-height: 44px; }
+.more-list a > :not(picture) { margin-inline: 16px; }
+.more-list img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; margin-bottom: 6px; }
+.more-title { font-family: var(--serif); font-size: 18px; line-height: 1.2; color: var(--muted-on-night); }
 .more-list a:hover { border-color: #fff; }
 .more-list .code { justify-self: start; }
 .more-list b { font-size: 22px; letter-spacing: -.02em; }
@@ -280,22 +273,17 @@ p { margin: 0; }
 @keyframes kenburns { from { transform: scale(1.18); } to { transform: scale(1); } }
 @keyframes rise { from { transform: translateY(105%); } to { transform: none; } }
 @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-@keyframes drive { from { transform: translateX(0); } to { transform: translateX(calc(100cqw - 30px)); } }
 
 /* Scroll-driven moments: only where the browser supports them. Every element starts visible. */
 @supports (animation-timeline: view()) {
   .cover-img img { animation: kenburns 2.6s cubic-bezier(.2,.7,.2,1) both, cover-out linear both; animation-timeline: auto, scroll(root); animation-range: normal, 0 100svh; }
   .cover h1 { animation: lift linear both; animation-timeline: scroll(root); animation-range: 0 90svh; }
-  .track::before { animation: draw linear both; animation-timeline: view(); animation-range: entry 10% cover 40%; }
-  .f-media img { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% cover 45%; }
   .pass-wrap { animation: print linear both; animation-timeline: view(); animation-range: entry 0% cover 35%; }
   .quote .hl { animation: underline linear both; animation-timeline: view(); animation-range: entry 30% cover 50%; }
   .back-img img { animation: drift linear both; animation-timeline: view(); }
   .day { animation: fade linear both; animation-timeline: view(); animation-range: entry 0% entry 80%; }
   @keyframes cover-out { to { transform: scale(1.15); filter: brightness(.55); } }
   @keyframes lift { to { transform: translateY(-22%); } }
-  @keyframes draw { from { transform: scaleX(.08); } to { transform: scaleX(1); } }
-  @keyframes reveal { from { clip-path: inset(12% 6% 12% 6%); transform: scale(1.12); } to { clip-path: inset(0); transform: scale(1); } }
   @keyframes print { from { transform: translateY(32px); } to { transform: none; } }
   @keyframes underline { from { background-size: 0% .09em; } to { background-size: 100% .09em; } }
   @keyframes drift { from { transform: scale(1.18) translateY(-4%); } to { transform: scale(1.02) translateY(4%); } }
@@ -303,20 +291,14 @@ p { margin: 0; }
 
 @media (min-width: 900px) {
   .mast nav { display: flex; }
-  .cover { --title: min(clamp(180px, 24vw, 360px), (var(--cover-h) - 350px) / 1.65); }
   .search { grid-column: 1 / -1; width: 100%; max-width: 620px; }
   .search-bar { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; }
   .search-field { height: 64px; }
   .cover .dek { top: auto; bottom: 220px; max-width: 260px; font-size: 32px; }
   .cover-foot { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
   .cover-lines { max-width: 620px; }
-  .network { padding-block: 96px; }
-  .tour-index { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .stop { font-size: 14px; }
-  .f-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); min-height: 760px; }
-  .feature:nth-of-type(even) .f-media { order: 2; }
-  .f-media { height: auto; min-height: 760px; }
-  .f-copy { padding: 72px 56px; align-content: center; }
+  .network { padding-block: 96px 40px; }
+  .cards { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 20px; }
   .booking-picked { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
   .fleet { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .reserve { padding-block: 96px; }
@@ -336,6 +318,14 @@ p { margin: 0; }
 @media (max-height: 480px) {
   .cover-foot { padding-right: 76px; }
   .search-results:not([hidden]) { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+}
+
+/* On phones a bus card puts the drawing beside the text, so the fleet takes one screen, not three. */
+@media (max-width: 899px) {
+  .fleet a { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 2px 16px; align-items: start; }
+  .fleet-bus { grid-row: span 3; margin: 4px 0 0; }
+  .fleet b { font-size: 22px; }
+  .fleet .fleet-cta { padding-top: 6px; }
 }
 
 @media (max-width: 429px) {

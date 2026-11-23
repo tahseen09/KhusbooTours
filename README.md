@@ -1,6 +1,6 @@
 # Khusboo Tours
 
-The website for Khusboo Tours, Rourkela. It is a travel magazine: each trip is an article with a boarding pass, and the home page shows each trip with its bus route.
+The website for Khusboo Tours, Rourkela. It is a travel magazine: each trip is an article with a boarding pass, and the home page shows each trip as a card.
 
 Live site: https://tahseen09.github.io/KhusbooTours/
 
@@ -15,6 +15,10 @@ npm run build    # static site in dist/
 ## Add or change a trip
 
 Each trip is one Markdown file in `src/content/trips/`. Copy an existing file, change the details, and add photos to `src/assets/photos/`. The home page, search and trip page update by themselves.
+
+A place without an article (for example Netarhat or Nepal) goes in `EXTRA_DESTINATIONS` in `src/lib/site.ts`, with a photo from `src/assets/photos/`. The home page and search list it under "Plan with us".
+
+The site shows no durations or prices, because they change from trip to trip.
 
 `src/data/photo-sources.json` lists where each photo came from. All photos use the Unsplash License, which needs no credit.
 

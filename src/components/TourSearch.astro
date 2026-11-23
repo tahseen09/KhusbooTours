@@ -2,20 +2,20 @@
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
 import { EXTRA_DESTINATIONS } from '../lib/site';
+import { photo } from '../lib/photos';
 
 const sorted = (await getCollection('trips')).sort((a, b) => a.data.order - b.data.order);
 const tours = await Promise.all(sorted.map(async ({ id, data: t }) => {
   const places = [...new Set([...t.stops, ...t.days.map((d) => d.place)])].filter((place) => place !== 'Home');
   return {
     name: t.name, region: t.region, bookingId: t.bookingId, places, aliases: [] as string[],
-    thumb: (await getImage({ src: t.hero, width: 128, format: 'webp', quality: 50 })).src as string | undefined,
+    thumb: (await getImage({ src: t.hero, width: 128, format: 'webp', quality: 50 })).src,
     haystack: [t.name, t.city, t.region, t.kicker, t.bestFor, t.dek, t.place, ...t.tags, ...places].join(' ').toLowerCase(),
   };
 }));
-const photos = import.meta.glob<{ default: ImageMetadata }>('../assets/photos/*.jpg');
 const destinations = [...tours, ...await Promise.all(EXTRA_DESTINATIONS.map(async (d) => ({
   ...d, bookingId: undefined, places: [] as string[],
-  thumb: (await getImage({ src: (await photos[`../assets/photos/${d.photo}.jpg`]()).default, width: 128, format: 'webp', quality: 50 })).src as string | undefined,
+  thumb: (await getImage({ src: photo(d.photo), width: 128, format: 'webp', quality: 50 })).src,
   haystack: [d.name, d.region, ...d.aliases].join(' ').toLowerCase(),
 })))];
 ---
@@ -36,7 +36,7 @@ const destinations = [...tours, ...await Promise.all(EXTRA_DESTINATIONS.map(asyn
     {destinations.map((place) => (
       <li data-kind="plan" data-name={place.name} data-aliases={place.aliases.join('|')} data-booking-id={place.bookingId} data-search={place.haystack} data-places={place.places.join('|')}>
         <button type="button">
-          {place.thumb ? <img src={place.thumb} alt="" width="56" height="56" loading="lazy" /> : <span class="search-thumb" />}
+          <img src={place.thumb} alt="" width="56" height="56" loading="lazy" />
           <span><b>{place.name}</b><span class="soft" data-detail data-default={place.region}>{place.region}</span></span>
         </button>
       </li>

@@ -83,6 +83,14 @@ const navTrips = [
         document.getElementById('search')?.scrollIntoView();
         setTimeout(() => searchInput.focus({ preventScroll: true }), 400);
       });
+      // Two WhatsApp buttons on screen at once is one too many, and the floating one covers the other.
+      const fab = document.getElementById('fab')!;
+      const visible = new Set<Element>();
+      const waButtons = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => entry.isIntersecting ? visible.add(entry.target) : visible.delete(entry.target));
+        fab.classList.toggle('near-wa', visible.size > 0);
+      });
+      document.querySelectorAll('main .btn-wa, main .fleet a').forEach((button) => waButtons.observe(button));
       if (searchInput && location.hash === '#search') {
         // The jump to the #search anchor clears focus, so focus after the page has loaded.
         addEventListener('load', () => setTimeout(() => searchInput.focus({ preventScroll: true })));

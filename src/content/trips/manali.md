@@ -5,7 +5,6 @@ name: Manali
 city: Kullu
 region: "Himachal Pradesh"
 iata: KUU
-nights: 6N/7D
 bestFor: Adventure and snow
 tags: [snow, adventure]
 color: "#14A86E"
@@ -14,7 +13,7 @@ background: "#0D1F17"
 foreground: "#FFFFFF"
 stops: [Manali, Atal Tunnel, Solang]
 busSeconds: 9.5
-kicker: The Manali issue · 6N / 7D
+kicker: The Manali issue
 title: Jump off a mountain. Legally.
 dek: Paragliding in Solang, the long glow of the Atal Tunnel, and cafés where nobody checks the time.
 hero: ../../assets/photos/manali-paraglider.jpg
@@ -58,4 +57,4 @@ gallery:
     caption: Manali town
 ---
 
-Manali is where a lot of people take their first real trip with friends. Seven days, a group, and a valley that has something for every kind of brave.
+Manali is where a lot of people take their first real trip with friends. A group, a bus, and a valley that has something for every kind of brave.

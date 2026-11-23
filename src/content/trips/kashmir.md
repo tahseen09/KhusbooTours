@@ -5,7 +5,6 @@ name: Kashmir
 city: Srinagar
 region: "Jammu & Kashmir"
 iata: SXR
-nights: 5N/6D
 bestFor: Snow and houseboats
 tags: [snow]
 color: "#2F5BFF"
@@ -14,9 +13,9 @@ background: "#0E1733"
 foreground: "#FFFFFF"
 stops: [Srinagar, Gulmarg, Sonmarg, Dal Lake]
 busSeconds: 11
-kicker: The Kashmir issue · 5N / 6D
+kicker: The Kashmir issue
 title: Sleep on the water. Wake up in snow.
-dek: A houseboat on Dal Lake, a gondola up Gulmarg, and Sonmarg’s glacier light. Six days that feel like a month.
+dek: A houseboat on Dal Lake, a gondola up Gulmarg, and Sonmarg’s glacier light.
 hero: ../../assets/photos/kashmir-shikaras.jpg
 heroAlt: Shikaras crossing Dal Lake on a misty morning
 place: Dal Lake, Srinagar

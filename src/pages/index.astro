@@ -3,20 +3,21 @@ import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
 import Photo from '../components/Photo.astro';
 import Base from '../layouts/Base.astro';
-import BoardingPass from '../components/BoardingPass.astro';
 import BookingEngine from '../components/BookingEngine.astro';
 import TourSearch from '../components/TourSearch.astro';
 import ReserveBus from '../components/ReserveBus.astro';
-import { withBase } from '../lib/site';
+import WhatsAppIcon from '../components/WhatsAppIcon.astro';
+import { EXTRA_DESTINATIONS as extras, tourMessage, whatsappLink, withBase } from '../lib/site';
+import { photo } from '../lib/photos';
 import coverPhoto from '../assets/photos/cover-dal-lake-houseboats.jpg';
 
 const trips = (await getCollection('trips')).sort((a, b) => a.data.order - b.data.order);
-const sizes = '(min-width: 900px) 55vw, 100vw';
+const sizes = '(min-width: 1100px) 400px, (min-width: 700px) 50vw, 100vw';
 const og = await getImage({ src: coverPhoto, width: 1200, format: 'jpg', quality: 70 });
 ---
 <Base
   title="Khusboo Tours · Trips from Rourkela to Kashmir, Gangtok, Manali and Goa"
-  description={`Tour packages from Rourkela, Odisha. Kashmir, Gangtok, Manali and Goa with travel, hotels and sightseeing included. AC, Non-AC and Sleeper buses to reserve.`}
+  description={`Tour packages from Rourkela, Odisha. Kashmir, Gangtok, Manali, Goa, Netarhat and Nepal with travel, hotels and sightseeing included. AC, Non-AC and Sleeper buses to reserve.`}
   ogImage={og.src}
 >
   <section class="cover" aria-label="Cover">
@@ -24,8 +25,7 @@ const og = await getImage({ src: coverPhoto, width: 1200, format: 'jpg', quality
       <Photo src={coverPhoto} alt="Houseboats moored below snow-capped mountains" sizes="100vw" priority />
     </div>
     <h1 aria-label="Escape">
-      <span class="row" aria-hidden="true"><span class="ch" style="--i:0">E</span><span class="ch" style="--i:1">S</span><span class="ch" style="--i:2">C</span></span>
-      <span class="row" aria-hidden="true"><span class="ch" style="--i:3">A</span><span class="ch" style="--i:4">P</span><span class="ch" style="--i:5">E</span></span>
+      <span class="row" aria-hidden="true">{[...'ESCAPE'].map((ch, i) => <span class="ch" style={`--i:${i}`}>{ch}</span>)}</span>
     </h1>
     <p class="dek">The issue for people who need a weekend that lasts a week.</p>
     <div class="cover-foot">
@@ -37,7 +37,7 @@ const og = await getImage({ src: coverPhoto, width: 1200, format: 'jpg', quality
         <a class="reserve-line" href="#reserve" style="--i:3">Reserve a whole bus <span>— AC, Non-AC, Sleeper</span></a>
       </div>
       <div class="board">
-        <div class="flapwrap"><span class="eyebrow">Where we go</span><div class="flaps" id="flaps" data-words={trips.map((t) => t.data.name.toUpperCase()).join(',')} aria-hidden="true"></div></div>
+        <div class="flapwrap"><span class="eyebrow">Where we go</span><div class="flaps" id="flaps" data-words={[...trips.map((t) => t.data.name), ...extras.map((d) => d.name)].map((name) => name.toUpperCase()).join(',')} aria-hidden="true"></div></div>
       </div>
     </div>
   </section>
@@ -47,34 +47,41 @@ const og = await getImage({ src: coverPhoto, width: 1200, format: 'jpg', quality
       <div class="wrap">
         <span class="eyebrow">The network · every line leaves Rourkela</span>
         <h2 id="net-h" tabindex="-1">Pick a line. <span class="soft">We handle the ride.</span></h2>
-        <nav class="tour-index" aria-label="Tours in this issue">
-          {trips.map(({ id, data: t }) => (
-            <a class="tour-jump" href={`#${id}`} data-id={id} style={`--c:${t.color};--on:${t.onColor}`}>
-              <span class="code">{t.code}</span><b>{t.name}</b><span class="mono">{t.nights}</span>
-            </a>
-          ))}
-        </nav>
       </div>
     </header>
-    <div>
+    <div class="wrap cards">
       {trips.map(({ id, data: t }) => (
-        <article class="feature" id={id} style={`--bg:${t.background};--fg:${t.foreground};--c:${t.color};--on:${t.onColor};--d:${t.busSeconds}s`}>
-          <div class="f-grid">
-            <div class="f-media">
-              <Photo src={t.hero} alt={t.heroAlt} sizes={sizes} />
-              <span class="code">LINE {t.code}</span>
-              <span class="place">{t.place}</span>
+        <article class="card" id={id} style={`--c:${t.color};--on:${t.onColor}`}>
+          <div class="card-media">
+            <Photo src={t.hero} alt={t.heroAlt} sizes={sizes} />
+            <span class="code">LINE {t.code}</span>
+          </div>
+          <div class="card-body">
+            <span class="eyebrow">{t.name} · {t.region}</span>
+            {/* The title link covers the whole card, so a tap anywhere opens the trip. */}
+            <h3><a class="card-link" href={withBase(`trips/${id}/`)}>{t.title}</a></h3>
+            <p>{t.dek}</p>
+            <div class="card-actions">
+              <a class="btn-wa" href={whatsappLink(tourMessage(t.name))} target="_blank" rel="noopener"><WhatsAppIcon /> Ask for dates</a>
+              <span class="card-more" aria-hidden="true">See the trip →</span>
             </div>
-            <div class="f-copy">
-              <span class="eyebrow">{t.kicker}</span>
-              <h3><a href={withBase(`trips/${id}/`)}>{t.title}</a></h3>
-              <p class="dek-text">{t.dek}</p>
-              <div class="track">
-                <span class="bus"><svg viewBox="0 0 30 20" aria-hidden="true"><rect x="1" y="1" width="28" height="14" rx="3" fill="currentColor"/><rect x="4" y="4" width="5" height="5" rx="1" class="cutout"/><rect x="11" y="4" width="5" height="5" rx="1" class="cutout"/><rect x="18" y="4" width="5" height="5" rx="1" class="cutout"/><circle cx="8" cy="16" r="3" fill="currentColor" class="rim"/><circle cx="22" cy="16" r="3" fill="currentColor" class="rim"/></svg></span>
-                <span class="stops">{t.stops.map((s) => <span class="stop">{s}</span>)}</span>
-              </div>
-              <BoardingPass trip={t} />
-              <a class="read" href={withBase(`trips/${id}/`)}>Read the full itinerary →</a>
+          </div>
+        </article>
+      ))}
+    </div>
+    <div class="wrap">
+      <h3 class="eyebrow plan-h">Plan with us · tell us your dates and we build the trip</h3>
+    </div>
+    <div class="wrap cards">
+      {extras.map((d) => (
+        <article class="card">
+          <div class="card-media"><Photo src={photo(d.photo)} alt={d.photoAlt} sizes={sizes} /></div>
+          <div class="card-body">
+            <span class="eyebrow">{d.name} · {d.region}</span>
+            <h3>{d.title}</h3>
+            <p>{d.dek}</p>
+            <div class="card-actions">
+              <a class="btn-wa" href={whatsappLink(tourMessage(d.name))} target="_blank" rel="noopener"><WhatsAppIcon /> Plan it with us</a>
             </div>
           </div>
         </article>

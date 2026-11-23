@@ -5,7 +5,6 @@ name: Goa
 city: Goa
 region: "Goa"
 iata: GOX
-nights: 4N/5D
 bestFor: Beaches and sunsets
 tags: [beach]
 color: "#FF5A1F"
@@ -14,7 +13,7 @@ background: "#1E0F0A"
 foreground: "#FFFFFF"
 stops: [North Goa, Old Goa, South Goa]
 busSeconds: 7
-kicker: The Goa issue · 4N / 5D
+kicker: The Goa issue
 title: Sunsets are better together.
 dek: Old churches, spice farms, jet skis, a river cruise at sunset, and the slow ride back from South Goa with the windows down.
 hero: ../../assets/photos/goa-beach-hill.jpg
