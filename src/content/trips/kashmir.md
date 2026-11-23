@@ -3,6 +3,7 @@ order: 1
 code: K5
 name: Kashmir
 city: Srinagar
+region: "Jammu & Kashmir"
 iata: SXR
 nights: 5N/6D
 bestFor: Snow and houseboats

@@ -26,6 +26,8 @@ The site crops the engine's header and heading on its first page, so the booking
 
 The engine must open seat selection with `target="_top"`, because that step refuses to load in an iframe.
 
+The search lists the tours on sale from the engine's feed, `TOURS_FEED_URL` in `src/lib/site.ts`. It lists the magazine's other tours under "Plan with us". When a magazine tour goes on sale, add its engine id as `bookingId` to its file in `src/content/trips/`. Without the id, the search matches the tour by its name. If the feed does not load, the search shows only the magazine's tours.
+
 ## Deploy
 
 A push to `main` builds the site and publishes it to the `gh-pages` branch (see `.github/workflows/deploy.yml`).

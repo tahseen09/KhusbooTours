@@ -30,6 +30,8 @@ import backPhoto from '../assets/photos/sikkim-kanchenjunga.jpg';
 </section>
 
 <script>
+  import { BOOKING_URL } from '../lib/site';
+
   const frame = document.querySelector<HTMLIFrameElement>('.booking-frame')!;
   const bookingWindow = frame.parentElement!;
   // Back can restore the iframe on a tour page, so its first load is not always the listing.
@@ -38,6 +40,15 @@ import backPhoto from '../assets/photos/sikkim-kanchenjunga.jpg';
   let inView = false;
   // Past the first page the engine has its own buttons at the bottom, which the WhatsApp button would cover.
   const syncFab = () => document.getElementById('fab')?.classList.toggle('away', loads > 1 && inView);
+  // The search opens one tour, or the whole list again. Only the list has the header that we crop.
+  document.addEventListener('booking:open', (event) => {
+    const url = (event as CustomEvent<string>).detail;
+    const isList = url === BOOKING_URL;
+    if (isList && loads <= 1) return;   // already on the list
+    bookingWindow.classList.toggle('full', !isList);
+    loads = isList ? 0 : 1;
+    frame.src = url;
+  });
   frame.addEventListener('load', () => {
     // Only the engine's first page has the duplicate header that we crop. Later pages show in full.
     if (++loads > 1) bookingWindow.classList.add('full');

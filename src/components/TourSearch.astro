@@ -1,16 +1,21 @@
 ---
 import { getCollection } from 'astro:content';
 import { getImage } from 'astro:assets';
+import { EXTRA_DESTINATIONS } from '../lib/site';
 
 const sorted = (await getCollection('trips')).sort((a, b) => a.data.order - b.data.order);
 const tours = await Promise.all(sorted.map(async ({ id, data: t }) => {
   const places = [...new Set([...t.stops, ...t.days.map((d) => d.place)])].filter((place) => place !== 'Home');
   return {
-    id, name: t.name, nights: t.nights, bestFor: t.bestFor, places,
-    thumb: await getImage({ src: t.hero, width: 128, format: 'webp', quality: 50 }),
-    haystack: [t.name, t.city, t.kicker, t.bestFor, t.dek, t.place, ...t.tags, ...places].join(' ').toLowerCase(),
+    name: t.name, region: t.region, bookingId: t.bookingId, places, aliases: [] as string[],
+    thumb: (await getImage({ src: t.hero, width: 128, format: 'webp', quality: 50 })).src as string | undefined,
+    haystack: [t.name, t.city, t.region, t.kicker, t.bestFor, t.dek, t.place, ...t.tags, ...places].join(' ').toLowerCase(),
   };
 }));
+const destinations = [...tours, ...EXTRA_DESTINATIONS.map((d) => ({
+  ...d, bookingId: undefined, places: [] as string[], thumb: undefined,
+  haystack: [d.name, d.region, ...d.aliases].join(' ').toLowerCase(),
+}))];
 ---
 <form class="search" id="search" role="search" action="#booking-start">
   <div class="search-bar">
@@ -24,76 +29,162 @@ const tours = await Promise.all(sorted.map(async ({ id, data: t }) => {
     <button class="search-all" id="search-all" type="button">Show all <span aria-hidden="true">↓</span></button>
   </div>
   <ul class="search-results" id="search-results" hidden>
-    {tours.map((tour) => (
-      <li data-id={tour.id} data-name={tour.name} data-nights={tour.nights} data-search={tour.haystack} data-places={tour.places.join('|')}>
+    <li class="search-group" id="search-live-group" role="presentation" hidden>Book online</li>
+    <li class="search-group" id="search-plan-group" role="presentation" hidden>Plan with us</li>
+    {destinations.map((place) => (
+      <li data-kind="plan" data-name={place.name} data-aliases={place.aliases.join('|')} data-booking-id={place.bookingId} data-search={place.haystack} data-places={place.places.join('|')}>
         <button type="button">
-          <img src={tour.thumb.src} alt="" width="56" height="56" loading="lazy" />
-          <span><b>{tour.name} tour</b><span class="soft">{tour.nights} · <span data-detail data-default={tour.bestFor}>{tour.bestFor}</span></span></span>
+          {place.thumb ? <img src={place.thumb} alt="" width="56" height="56" loading="lazy" /> : <span class="search-thumb" />}
+          <span><b>{place.name}</b><span class="soft" data-detail data-default={place.region}>{place.region}</span></span>
         </button>
       </li>
     ))}
-    <li class="search-empty" id="search-empty" hidden>Not featured here. Press Find tour to check booking.</li>
+    <li class="search-empty" id="search-empty" hidden>Not on our list yet. Press Find tour to ask us.</li>
   </ul>
   <p class="visually-hidden" id="search-status" aria-live="polite"></p>
 </form>
 
 <script>
-  import { tourMessage, whatsappLink } from '../lib/site';
+  import { BOOKING_URL, TOURS_FEED_URL, tourMessage, whatsappLink } from '../lib/site';
+
+  type LiveTour = { id: number; name: string; days: number; start: string; places: string[]; url: string; cover: string | null };
 
   const form = document.getElementById('search') as HTMLFormElement;
   const input = document.getElementById('search-input') as HTMLInputElement;
   const submit = form.querySelector<HTMLButtonElement>('[type="submit"]')!;
   const suggestions = document.getElementById('search-results')!;
+  const liveGroup = document.getElementById('search-live-group')!;
+  const planGroup = document.getElementById('search-plan-group')!;
   const status = document.getElementById('search-status')!;
   const empty = document.getElementById('search-empty')!;
-  const items = Array.from(suggestions.querySelectorAll<HTMLLIElement>('li[data-search]'));
   const start = document.getElementById('booking-start')!;
   const picked = document.getElementById('booking-picked')!;
   const pickedTitle = document.getElementById('booking-picked-title')!;
   const pickedNote = document.getElementById('booking-picked-note')!;
   const pickedLink = document.getElementById('booking-picked-link') as HTMLAnchorElement;
+  const engineOrigin = new URL(BOOKING_URL).origin;
+
+  const items = () => Array.from(suggestions.querySelectorAll<HTMLLIElement>('li[data-search]'));
+  const sameName = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+  const openInEngine = (url: string) => document.dispatchEvent(new CustomEvent('booking:open', { detail: url }));
 
   const findMatches = () => {
     const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
-    return items.filter((li) => terms.every((term) => li.dataset.search!.includes(term)));
+    const all = items().filter((li) => terms.every((term) => li.dataset.search!.includes(term)));
+    // A picked or typed name wins over a word that happens to be in other tours.
+    const exact = all.filter((li) => sameName(li.dataset.name!, input.value));
+    return exact.length ? exact : all;
   };
 
   const suggest = () => {
     const matches = findMatches();
     const query = input.value.trim().toLowerCase();
-    items.forEach((li) => {
+    items().forEach((li) => {
       li.hidden = !matches.includes(li);
       // A search for a place inside a tour should say why that tour matched.
       const place = query && li.dataset.places!.split('|').find((p) => p.toLowerCase().includes(query));
       const detail = li.querySelector<HTMLElement>('[data-detail]')!;
       detail.textContent = place ? `includes ${place}` : detail.dataset.default!;
     });
+    const live = matches.some((li) => li.dataset.kind === 'live');
+    liveGroup.hidden = !live;
+    planGroup.hidden = !live || !matches.some((li) => li.dataset.kind === 'plan');
     suggestions.hidden = false;
     empty.hidden = matches.length > 0;
-    status.textContent = matches.length ? `${matches.length} tour${matches.length === 1 ? '' : 's'} found` : 'Not featured here. Press Find tour to check booking.';
+    status.textContent = matches.length ? `${matches.length} tour${matches.length === 1 ? '' : 's'} found` : 'No tours found';
   };
   const close = () => { suggestions.hidden = true; status.textContent = ''; };
 
-  // The engine cannot take a search term, so repeat the search above it and put it in the WhatsApp message.
+  const onPick = (li: HTMLLIElement) => li.querySelector('button')!.addEventListener('click', () => {
+    input.value = li.dataset.name!;
+    close();
+    // Focus on the input would open the list and the phone keyboard again.
+    submit.focus({ preventScroll: true });
+  });
+  items().forEach(onPick);
+
+  const liveItem = (tour: LiveTour) => {
+    const li = document.createElement('li');
+    Object.assign(li.dataset, {
+      kind: 'live', name: tour.name, url: tour.url, places: tour.places.join('|'),
+      search: [tour.name, tour.start, ...tour.places].join(' ').toLowerCase(),
+    });
+    const button = document.createElement('button');
+    button.type = 'button';
+    const thumb = document.createElement(tour.cover ? 'img' : 'span');
+    thumb.className = 'search-thumb';
+    if (thumb instanceof HTMLImageElement) Object.assign(thumb, { src: tour.cover, alt: '', width: 56, height: 56, loading: 'lazy' });
+    const text = document.createElement('span');
+    const name = document.createElement('b');
+    name.textContent = tour.name;
+    const detail = document.createElement('span');
+    detail.className = 'soft';
+    detail.dataset.detail = '';
+    detail.dataset.default = tour.places.join(', ') || `from ${tour.start}`;
+    detail.textContent = detail.dataset.default;
+    text.append(name, detail);
+    button.append(thumb, text);
+    li.append(button);
+    onPick(li);
+    return li;
+  };
+
+  // Tours on sale come live from the booking engine. Without them, the search still offers the magazine's tours.
+  const loadLiveTours = async () => {
+    try {
+      const response = await fetch(TOURS_FEED_URL, { signal: AbortSignal.timeout(8000) });
+      if (!response.ok) return;
+      const { tours } = (await response.json()) as { tours: LiveTour[] };
+      // Only the engine's own pages may open in the booking window.
+      const onSale = tours.filter((t) => new URL(t.url).origin === engineOrigin
+        && (!t.cover || new URL(t.cover).origin === engineOrigin));
+      onSale.forEach((tour) => {
+        items().filter((li) => li.dataset.kind === 'plan'
+          && (li.dataset.bookingId ? Number(li.dataset.bookingId) === tour.id
+            : [li.dataset.name!, ...li.dataset.aliases!.split('|')].some((name) => sameName(name, tour.name))))
+          .forEach((li) => li.remove());
+      });
+      planGroup.before(...onSale.map(liveItem));
+      if (!suggestions.hidden) suggest();
+    } catch {
+      // Offline, slow or blocked: keep the magazine's tours.
+    }
+  };
+  if (document.readyState === 'complete') loadLiveTours();
+  else addEventListener('load', () => loadLiveTours(), { once: true });
+
+  // The search names the tour above the engine and opens it there, so one tap leads to dates and seats.
   const showSearchAtBooking = () => {
     const query = input.value.trim();
     picked.hidden = !query;
-    if (!query) return;
+    if (!query) return openInEngine(BOOKING_URL);
     const matches = findMatches();
+    const live = matches.filter((li) => li.dataset.kind === 'live');
     const names = matches.map((li) => li.dataset.name).join(', ');
     let message = `Hi Khusboo Tours, I searched for “${query}”. Can you plan this trip for me?`;
-    if (matches.length === 1) {
-      const { name, nights } = matches[0].dataset;
-      pickedTitle.textContent = `${name} tour · ${nights}`;
-      pickedNote.textContent = 'See if it is open for booking below, or ask us for dates.';
-      message = tourMessage(name!, nights!);
+    if (live.length === 1) {
+      const { name, url } = live[0].dataset;
+      pickedTitle.textContent = name!;
+      pickedNote.textContent = 'Pick a date and your seats below, or ask us on WhatsApp.';
+      message = tourMessage(name!);
+      openInEngine(url!);
+    } else if (matches.length === 1) {
+      const { name } = matches[0].dataset;
+      pickedTitle.textContent = `${name} tour`;
+      pickedNote.textContent = 'Not open for online booking yet. Ask us for the next dates.';
+      message = tourMessage(name!);
+      openInEngine(BOOKING_URL);
     } else if (matches.length) {
       pickedTitle.textContent = `${matches.length} tours for “${query}”`;
-      pickedNote.textContent = `${names}. See which are open below, or ask us to help you choose.`;
+      pickedNote.textContent = live.length
+        ? `${names}. Book the open ones below, or ask us to help you choose.`
+        : `${names}. Ask us for the next dates.`;
       message = `Hi Khusboo Tours, I searched for “${query}”. Please share the dates and prices for ${names}.`;
+      openInEngine(BOOKING_URL);
     } else {
-      pickedTitle.textContent = `Looking for “${query}”?`;
-      pickedNote.textContent = 'See if it is open for booking below, or ask us to plan it.';
+      pickedTitle.textContent = `No “${query}” tour yet`;
+      pickedNote.textContent = 'Ask us to plan it, or see the tours open for booking below.';
+      openInEngine(BOOKING_URL);
     }
     pickedLink.href = whatsappLink(message);
   };
@@ -103,12 +194,6 @@ const tours = await Promise.all(sorted.map(async ({ id, data: t }) => {
     document.getElementById('lines')!.scrollIntoView();
   };
 
-  items.forEach((li) => li.querySelector('button')!.addEventListener('click', () => {
-    input.value = li.dataset.name!;
-    close();
-    // Focus on the input would open the list and the phone keyboard again.
-    submit.focus({ preventScroll: true });
-  }));
   input.addEventListener('focus', () => {
     suggest();
     // A search ends at the engine, so start its load before the scroll gets there.
@@ -135,7 +220,7 @@ const tours = await Promise.all(sorted.map(async ({ id, data: t }) => {
   form.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') return close();
     if (suggestions.hidden || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
-    const options = items.filter((li) => !li.hidden).map((li) => li.querySelector('button')!);
+    const options = items().filter((li) => !li.hidden).map((li) => li.querySelector('button')!);
     const index = options.indexOf(document.activeElement as HTMLButtonElement);
     const next = event.key === 'ArrowDown' ? options[index + 1] : options[index - 1];
     event.preventDefault();

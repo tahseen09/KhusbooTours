@@ -269,6 +269,8 @@ p { margin: 0; }
 .search-results button > span { display: grid; min-width: 0; line-height: 1.25; }
 .search-results b { font-size: 16px; }
 .search-results .soft { font-size: 13px; }
+.search-group { grid-column: 1 / -1; padding: 8px 8px 4px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.search-thumb { width: 56px; height: 56px; flex: none; border-radius: 6px; background: linear-gradient(135deg, #2b3a55, #0b0d12); }
 .search-empty { padding: 12px 10px; font-size: 14px; color: var(--muted); }
 .mast-search { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: inherit; }
 .mast-search svg { width: 22px; height: 22px; }
@@ -347,7 +349,7 @@ p { margin: 0; }
 /* All four tours must fit in the search list without a scroll. */
 @media (max-height: 700px) {
   .search-results button { min-height: 44px; padding-block: 2px; }
-  .search-results img { width: 40px; height: 40px; }
+  .search-results img, .search-thumb { width: 40px; height: 40px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

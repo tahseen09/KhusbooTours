@@ -3,6 +3,7 @@ order: 4
 code: G4
 name: Goa
 city: Goa
+region: "Goa"
 iata: GOX
 nights: 4N/5D
 bestFor: Beaches and sunsets

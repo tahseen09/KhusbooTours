@@ -3,6 +3,7 @@ order: 3
 code: M6
 name: Manali
 city: Kullu
+region: "Himachal Pradesh"
 iata: KUU
 nights: 6N/7D
 bestFor: Adventure and snow

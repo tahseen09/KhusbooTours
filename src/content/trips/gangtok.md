@@ -3,6 +3,7 @@ order: 2
 code: S5
 name: Gangtok
 city: Bagdogra
+region: "Sikkim"
 iata: IXB
 nights: 5N/6D
 bestFor: Mountains and lakes

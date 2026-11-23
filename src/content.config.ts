@@ -7,9 +7,13 @@ const trips = defineCollection({
   schema: ({ image }) =>
     z.object({
       order: z.number(),
+      // The tour's id in FleetManager (the number in its /tours/<id>-name/ link), once it sells online.
+      bookingId: z.number().optional(),
       code: z.string(),
       name: z.string(),
       city: z.string(),
+      // The state or country, which the search shows under the name.
+      region: z.string(),
       iata: z.string(),
       nights: z.string(),
       bestFor: z.string(),
