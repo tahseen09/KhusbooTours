@@ -23,8 +23,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          SITE_URL: https://khusbootours.in
+          BASE_PATH: /
       # Publishes dist/ to the gh-pages branch and adds .nojekyll so the _astro folder is served.
       - uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          # Without it, each deploy removes the custom domain from the Pages settings.
+          cname: khusbootours.in

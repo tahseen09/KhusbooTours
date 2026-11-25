@@ -2,13 +2,13 @@
 
 The website for Khusboo Tours, Rourkela. It is a travel magazine: each trip is an article with a boarding pass, and the home page shows each trip as a card.
 
-Live site: https://tahseen09.github.io/KhusbooTours/
+Live site: https://khusbootours.in
 
 ## Run it
 
 ```sh
 npm install
-npm run dev      # http://localhost:4321/KhusbooTours/
+npm run dev      # http://localhost:4321/KhusbooTours/ (the local copy keeps the /KhusbooTours path)
 npm run build    # static site in dist/
 ```
 
@@ -36,4 +36,4 @@ The search lists the tours on sale from the engine's feed, `TOURS_FEED_URL` in `
 
 A push to `main` builds the site and publishes it to the `gh-pages` branch (see `.github/workflows/deploy.yml`).
 
-For a custom domain, set `SITE_URL` (for example `https://khusbootours.in`) and `BASE_PATH=/` in the workflow, and add the domain under the repo's Pages settings.
+The site runs on https://khusbootours.in. The workflow sets `SITE_URL`, `BASE_PATH=/` and `cname`. The domain's DNS points to GitHub Pages.
