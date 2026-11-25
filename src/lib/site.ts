@@ -1,6 +1,8 @@
 export const PHONE_DISPLAY = '+91 94388 36765';
 export const WHATSAPP_NUMBER = '919438836765';
 export const BOOKING_URL = 'https://fleetmanager.pythonanywhere.com/tickets/khusboo-tours/tours/';
+// The business's Razorpay Payment Page, where the customer types the amount. Empty hides every Pay now button.
+export const PAY_URL = 'https://razorpay.me/@khusbootoursandtravels';
 export const TOURS_FEED_URL = 'https://fleetmanager.pythonanywhere.com/tickets/khusboo-tours/api/tours/';
 
 export function whatsappLink(message = 'Hi Khusboo Tours, I want to plan a trip.') {

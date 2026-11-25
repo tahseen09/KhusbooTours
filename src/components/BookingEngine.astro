@@ -1,7 +1,7 @@
 ---
 import Photo from './Photo.astro';
 import WhatsAppIcon from './WhatsAppIcon.astro';
-import { BOOKING_URL, PHONE_DISPLAY, whatsappLink } from '../lib/site';
+import { BOOKING_URL, PAY_URL, PHONE_DISPLAY, whatsappLink } from '../lib/site';
 import backPhoto from '../assets/photos/sikkim-kanchenjunga.jpg';
 ---
 <section class="booking" id="book" aria-labelledby="book-h">
@@ -11,6 +11,7 @@ import backPhoto from '../assets/photos/sikkim-kanchenjunga.jpg';
       <span class="eyebrow">Back cover · Open for booking</span>
       <h2 id="book-h">Your seat is waiting.</h2>
       <a class="btn-wa" href={whatsappLink()} target="_blank" rel="noopener"><WhatsAppIcon /> Say hi on WhatsApp</a>
+      {PAY_URL && <a class="btn-pay" href={PAY_URL} target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></svg> Pay now · any amount</a>}
       <span class="phone">or call <a href="tel:+919438836765">{PHONE_DISPLAY}</a>, or book online below</span>
     </div>
   </div>

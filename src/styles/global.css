@@ -40,7 +40,7 @@ p { margin: 0; }
 .mast nav { display: none; gap: 24px; font-weight: 600; }
 .mast nav a { text-decoration: none; }
 .mast nav a:hover { color: var(--accent); }
-.mast .back-link { min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; text-decoration: none; }
+.mast .back-link { min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; text-decoration: none; white-space: nowrap; }
 
 /* Cover */
 .cover { --cover-h: clamp(640px, 100svh, 940px); --title: min(calc((100vw - 32px) / 3.9), 300px); position: relative; height: var(--cover-h); overflow: hidden; isolation: isolate; }
@@ -268,7 +268,11 @@ p { margin: 0; }
 .mast-search { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: inherit; }
 .mast-search svg { width: 22px; height: 22px; }
 .mast-book { min-height: 44px; padding: 0 18px; display: inline-flex; align-items: center; border-radius: 22px; background: var(--paper); color: var(--ink); font-weight: 800; text-decoration: none; }
-.mast-right { display: flex; align-items: center; gap: 16px; }
+.mast-right { display: flex; align-items: center; gap: 10px; }
+.mast-pay { min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 22px; background: var(--accent); color: var(--ink); font-weight: 800; text-decoration: none; white-space: nowrap; }
+.mast-pay:hover, .btn-pay:hover { filter: brightness(1.08); }
+.btn-pay { max-width: 420px; min-height: 50px; padding: 0 20px; border-radius: 6px; background: var(--accent); color: var(--ink); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; font-size: 16px; }
+.btn-pay svg { width: 20px; height: 20px; flex: none; }
 
 @keyframes kenburns { from { transform: scale(1.18); } to { transform: scale(1); } }
 @keyframes rise { from { transform: translateY(105%); } to { transform: none; } }
@@ -291,6 +295,7 @@ p { margin: 0; }
 
 @media (min-width: 900px) {
   .mast nav { display: flex; }
+  .mast-right { gap: 16px; }
   .search { grid-column: 1 / -1; width: 100%; max-width: 620px; }
   .search-bar { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; }
   .search-field { height: 64px; }
@@ -345,4 +350,14 @@ p { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
+}
+
+/* The smallest phones fit the logo, search, Pay now and Book in one row. */
+@media (max-width: 374px) {
+  .mast { gap: 8px; }
+  .mast-right { gap: 2px; }
+  .mast-pay, .mast-book { padding: 0 12px; font-size: 15px; }
+  .mast-search { width: 40px; }
+  .mast-logo b { font-size: 18px; }
+  .mast .back-link { font-size: 15px; }
 }
